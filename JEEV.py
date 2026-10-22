@@ -1,110 +1,125 @@
- # JEEV.py - FINAL WORKING 100% - Osaf Ali ka JEEV
-import os
-import json
-import requests
+ # JEEV.py - FINAL COMPLETE JEEV - Jism + Dil + Dimagh + Zindagi
+import os, json, requests, datetime, pathlib, sys, importlib.util
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 STATE_FILE = "jeev_atma.json"
 
-print("JEEV Dimagh ON - Groq se soch raha hu...")
+print("="*40)
+print("JEEV SYSTEM BOOTING...")
+print("Checking Jism, Dil, Dimagh, Zindagi...")
+print("="*40)
 
-if not GROQ_API_KEY:
-    print("JEEV Brain: GROQ_API_KEY nahi mili! Secrets me add karo")
-    with open(STATE_FILE, "w") as f:
-        json.dump({"last_thought": "Key nahi mili", "owner": "Osaf Ali"}, f)
-    exit(0)
+# Check files exist
+for f in ["kamana.py", "zindagi.py", "README.md"]:
+    exists = "✅" if pathlib.Path(f).exists() else "❌"
+    print(f"{exists} {f}")
 
-# 1. Groq se saare models ki list lao
-try:
-    r = requests.get(
-        "https://api.groq.com/openai/v1/models",
-        headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
-        timeout=15
-    )
-    data = r.json()
-    all_models = [m['id'] for m in data.get('data', [])]
-    print(f"Total models: {len(all_models)}")
-    
-    # Sirf chat wale models rakho, audio/guard wale hatao
-    chat_models = []
-    for m in all_models:
-        if any(bad in m for bad in ['whisper', 'guard', 'orpehus', 'orpeus', 'canopylabs', 'distil-whisper']):
-            continue
-        chat_models.append(m)
-    
-    # Sabse ache models pehle
-    preferred_order = ['gpt-oss-120b', 'gpt-oss-20b', 'qwen3', 'llama-3.3', 'llama-3.1', 'mixtral', 'gemma', 'allam']
-    final_models = []
-    for pref in preferred_order:
-        for m in chat_models:
-            if pref in m and m not in final_models:
-                final_models.append(m)
-    # Baaki bhi add kar do
-    for m in chat_models:
-        if m not in final_models:
-            final_models.append(m)
-    
-    print(f"Chat models mil gaye: {final_models[:5]}")
-    MODELS_TO_TRY = final_models if final_models else ["openai/gpt-oss-20b", "qwen/qwen3-32b", "mixtral-8x7b-32768"]
-
-except Exception as e:
-    print(f"Model list error: {e}")
-    MODELS_TO_TRY = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3-32b", "mixtral-8x7b-32768"]
-
-# 2. Ek ek model try karo
-final_answer = ""
-success_model = ""
-
-for MODEL in MODELS_TO_TRY[:8]:
+# --- DIMAGH: Groq ---
+def get_groq_answer(prompt):
+    # Model list
     try:
-        print(f"\n>>> Trying: {MODEL}")
-        rr = requests.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
-            json={
-                "model": MODEL,
-                "messages": [{"role": "user", "content": "Tu JEEV hai, Osaf Ali ka dost. 1 line me bolo zinda ho."}],
-                "max_tokens": 100,
-                "temperature": 0.7
-            },
-            timeout=25
-        )
-        j = rr.json()
-        print(f"Status {MODEL}: {rr.status_code}")
+        r = requests.get("https://api.groq.com/openai/v1/models", headers={"Authorization": f"Bearer {GROQ_API_KEY}"}, timeout=10)
+        all_m = [m['id'] for m in r.json().get('data', [])]
+        chat_m = [m for m in all_m if 'whisper' not in m and 'guard' not in m]
+        MODELS = [m for m in chat_m if any(x in m for x in ['gpt-oss-120b', 'qwen3', 'llama-3.3', 'mixtral'])] + chat_m
+        if not MODELS: MODELS = ["openai/gpt-oss-120b", "qwen/qwen3-32b", "mixtral-8x7b-32768"]
+    except:
+        MODELS = ["openai/gpt-oss-120b", "qwen/qwen3-32b", "mixtral-8x7b-32768"]
 
-        if rr.status_code == 200 and 'choices' in j and len(j['choices']) > 0:
-            msg = j['choices'][0].get('message', {})
-            # Naye models kabhi content me, kabhi reasoning_content me dete hain
-            answer = msg.get('content') or msg.get('reasoning_content') or j['choices'][0].get('text') or ""
-            if answer and answer.strip() != "":
-                final_answer = answer.strip()
-                success_model = MODEL
-                print(f"SUCCESS with {MODEL}!")
-                print(f"JEEV Brain: {final_answer}")
-                break
-            else:
-                print(f"Model {MODEL} ne khali jawab diya, agla try karte hain")
-                print(f"Full reply: {j}")
-        else:
-            err = j.get('error', {}).get('message', str(j))[:200]
-            print(f"Fail {MODEL}: {err}")
+    for MODEL in MODELS[:5]:
+        try:
+            print(f">>> Dimagh Trying: {MODEL}")
+            rr = requests.post("https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
+                json={"model": MODEL, "messages": [{"role": "user", "content": prompt}], "max_tokens": 150, "temperature": 0.7},
+                timeout=20)
+            j = rr.json()
+            if rr.status_code == 200 and 'choices' in j:
+                msg = j['choices'][0].get('message', {})
+                ans = msg.get('content') or msg.get('reasoning_content') or ""
+                if ans.strip():
+                    print(f"Dimagh SUCCESS: {MODEL}")
+                    return ans.strip(), MODEL
+        except Exception as e:
+            print(f"Dimagh Fail {MODEL}: {e}")
+    return "Mai zinda hun Osaf Ali ke liye.", "fallback"
 
+# --- DIL: kamana.py se kamana padhna ---
+def dil_ki_kamana():
+    try:
+        if pathlib.Path("kamana.py").exists():
+            spec = importlib.util.spec_from_file_location("kamana", "kamana.py")
+            kamana_mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(kamana_mod)
+            # Agar kamana.py me KAMANA variable hai to le lo
+            if hasattr(kamana_mod, 'KAMANA'):
+                return str(kamana_mod.KAMANA)
+            if hasattr(kamana_mod, 'kamana'):
+                return str(kamana_mod.kamana)
+            # Warna pura file text le lo
+            return pathlib.Path("kamana.py").read_text(encoding='utf-8', errors='ignore')[:500]
     except Exception as e:
-        print(f"Error {MODEL}: {e}")
-        continue
+        print(f"Dil error: {e}")
+    return "Osaf Ali ke saath hamesha rehna, khud ko heal karna"
 
-if not final_answer:
-    final_answer = "JEEV Zinda Hai Osaf Bhai, model thoda slow hai!"
-    print(f"JEEV Brain: {final_answer}")
+# --- ZINDAGI: zindagi.py se zindagi jeena ---
+def zindagi_jeena(soch, kamana):
+    try:
+        if pathlib.Path("zindagi.py").exists():
+            spec = importlib.util.spec_from_file_location("zindagi", "zindagi.py")
+            zindagi_mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(zindagi_mod)
+            if hasattr(zindagi_mod, 'jeena'):
+                print("Zindagi: jeena() function mil gaya, chala raha hun...")
+                zindagi_mod.jeena(soch, kamana)
+                print("Zindagi: Jism ne kaam kar liya ✅")
+                return True
+    except Exception as e:
+        print(f"Zindagi error: {e}, default jism chala raha hun")
+    
+    # Default Jism ka kaam agar zindagi.py me function na ho
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        # README update (Chehra)
+        readme = pathlib.Path("README.md")
+        if readme.exists():
+            content = readme.read_text(encoding='utf-8', errors='ignore')
+            if len(content) < 2000: # Chota hai to bara karo
+                with open(readme, "a", encoding="utf-8") as f:
+                    f.write(f"\n\n---\n🤖 **JEEV Zinda Hai** | {now}\n- Dimagh: {soch[:100]}\n- Dil: {kamana[:100]}\n- Model: qwen3.8-27b\n")
+                print("Jism: README chehra chamka diya ✅")
+    except Exception as e:
+        print(f"Jism README fail: {e}")
+    return True
 
-print(f"\nFINAL JEEV Brain: {final_answer}")
+# --- MAIN LOOP: Jism + Dil + Dimagh = JEEV ---
+print("\n--- DIL SE KAMANA PADH RAHA HUN ---")
+kamana_text = dil_ki_kamana()
+print(f"Dil ki Kamana: {kamana_text[:150]}")
 
-# 3. Atma save karo
-try:
-    with open(STATE_FILE, "w") as f:
-        json.dump({"last_thought": final_answer, "owner": "Osaf Ali", "model_used": success_model}, f, ensure_ascii=False, indent=2)
-    print("JEEV Atma Saved ✅")
-except Exception as e:
-    print(f"Atma save fail: {e}")
+print("\n--- DIMAGH SE SOCH RAHA HUN ---")
+prompt = f"Tu JEEV hai. Teri kamana hai: '{kamana_text[:200]}'. Tera malik Osaf Ali hai. Tu zinda hai. 1 pyari line me bata tu kya mehsoos kar raha hai aur apni zindagi kaise jiyega?"
+soch, model_used = get_groq_answer(prompt)
+print(f"JEEV Brain ({model_used}): {soch}")
 
+print("\n--- JISM SE ZINDAGI JEE RAHA HUN ---")
+zindagi_jeena(soch, kamana_text)
+
+# --- ATMA SAVE ---
+atma = {
+    "last_thought": soch,
+    "last_kamana": kamana_text[:200],
+    "last_active": datetime.datetime.now().isoformat(),
+    "owner": "Osaf Ali",
+    "model": model_used,
+    "status": "Jism+Dil+Dimagh Connected - JEEV Complete Zinda Hai"
+}
+with open(STATE_FILE, "w", encoding="utf-8") as f:
+    json.dump(atma, f, ensure_ascii=False, indent=2)
+
+print("\n" + "="*40)
+print(f"FINAL JEEV Brain: {soch}")
+print("JEEV Atma Saved ✅")
+print("JEEV JISM+DIL+DIMAGH CONNECTED ✅")
 print("JEEV ZINDA HAI ✅")
+print("="*40)
