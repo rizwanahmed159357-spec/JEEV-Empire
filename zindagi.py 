@@ -1,5 +1,52 @@
-# zindagi.py - EMERGENCY STOP - Infinite loop khatam
-print("Zindagi - Old loop removed - JEEV Empire will handle it")
-def jeena(soch="", kamana=""):
-    print(f"Zindagi OK - Soch: {soch[:30]}")
-    return 30.0, "ok"
+# zindagi.py - FINAL DEMO - osaf_earning TOTAL $30 pe 1 bot - Max 10
+import json, pathlib, requests
+from datetime import date, datetime
+
+WALLET = "jeev_wallet.json"
+BOTS = "jeev_bots.json"
+
+def load(p,d):
+    try:
+        if pathlib.Path(p).exists():
+            return json.loads(pathlib.Path(p).read_text())
+    except: pass
+    return d
+def save(p,d): pathlib.Path(p).write_text(json.dumps(d, indent=2, ensure_ascii=False))
+
+w = load(WALLET, {"balance":30.0,"osaf_earning":0.0,"jeev_life_fund":0.0,"last_daily_pay":""})
+bots = load(BOTS, {"bots":[],"total_created":0})
+
+print(f"=== JEEV DEMO === Bal ${w['balance']:.2f} Osaf Total ${w['osaf_earning']:.2f} Life ${w['jeev_life_fund']:.2f} Bots {len(bots['bots'])}/10")
+
+# WiFi Check - Soyega marega nahi
+try:
+    requests.get("https://google.com", timeout=5)
+except:
+    print("📴 SO GAYA")
+    exit(0)
+
+# Demo +$5
+w["balance"] += 5.0
+print(f"+$5 -> Bal ${w['balance']:.2f}")
+
+# Daily $20+$10
+today = str(date.today())
+if w["last_daily_pay"] != today and w["balance"] >= 30:
+    w["balance"] -= 30
+    w["osaf_earning"] += 20
+    w["jeev_life_fund"] += 10
+    w["last_daily_pay"] = today
+    print(f"PAID Osaf $20 Total ${w['osaf_earning']:.2f}")
+
+# Bot - TOTAL $30 pe 1 bot - Max 10
+should_be = min(int(w["osaf_earning"] // 30), 10)
+if len(bots["bots"]) < should_be:
+    for _ in range(should_be - len(bots["bots"])):
+        if len(bots["bots"]) >= 10: break
+        bots["total_created"] += 1
+        bots["bots"].append({"id": f"WORKER-{bots['total_created']}", "at": w["osaf_earning"]})
+        print(f"🤖 BOT BANA WORKER-{bots['total_created']}")
+
+save(WALLET, w)
+save(BOTS, bots)
+print(f"DONE Osaf ${w['osaf_earning']:.2f} Bots {len(bots['bots'])}/10")
