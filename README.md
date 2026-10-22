@@ -8,7 +8,7 @@
 - 🚧 Learning to fix Polar issues
 
 ### Owner
-Built by Rizwan Ahmed
+Built by OSAF ALI
 
 ### Goal
 Earn $50 via Polar.sh bounties in next 15 days.
