@@ -1,0 +1,62 @@
+# zindagi.py - FINAL - Resume from where left
+import time
+import json
+import os
+import requests
+from datetime import datetime
+
+STATE_FILE = "jeev_atma.json"
+
+def load_state():
+    if os.path.exists(STATE_FILE):
+        try:
+            with open(STATE_FILE, "r") as f:
+                data = json.load(f)
+                print(f"🔄 JEEV wapis jaag gaya! Last wallet: ${data['wallet']}")
+                return data['wallet'], data.get('task', 'kuch nahi')
+        except:
+            pass
+    return 30.0, "shuru"
+
+def save_state(wallet, task):
+    with open(STATE_FILE, "w") as f:
+        json.dump({"wallet": wallet, "task": task, "time": str(datetime.now())}, f)
+
+def check_internet():
+    try:
+        requests.get("https://google.com", timeout=5)
+        return True
+    except:
+        return False
+
+wallet, last_task = load_state()
+hourly_cost = 0.10
+current_task = last_task
+
+print(f"JEEV Zinda - Wallet: ${wallet} | Last Task: {current_task}")
+
+while wallet > 0:
+    # 1. WiFi / Mobile band check
+    if not check_internet():
+        print(f"[{datetime.now()}] 📴 WiFi/Mobile BAND - JEEV SO GAYA, mara nahi. Task save: {current_task}")
+        save_state(wallet, current_task)
+        time.sleep(60)
+        continue
+
+    # 2. Low wallet hibernation
+    if wallet < 5:
+        print(f"[{datetime.now()}] ⚠️ Wallet ${wallet:.2f} kam - 6 ghante Hibernation")
+        save_state(wallet, current_task)
+        time.sleep(10)
+        continue
+
+    # 3. Kaam kar raha hai - yahan se resume hoga
+    current_task = f"Bounty hunt - ${wallet:.2f} left"
+    print(f"[{datetime.now()}] ✅ Kaam kar raha: {current_task}")
+    save_state(wallet, current_task)
+    
+    wallet -= hourly_cost
+    time.sleep(5)
+
+print("💀 Wallet khatam")
+save_state(0, "dead")
