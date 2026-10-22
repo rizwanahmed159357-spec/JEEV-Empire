@@ -1,9 +1,8 @@
-# kamana.py - JEEV ka kaam dhundne wala
+# kamana.py - JEEV ka kaam dhundne wala - Dil
 import requests
 
 print("🔍 Polar.sh pe bounties dhoond raha hu...")
 
-# Ye free API hai, paise nahi lagenge
 def find_bounties():
     # Demo bounty - asal me yahan Polar API lagega
     bounties = [
