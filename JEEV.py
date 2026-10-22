@@ -1,58 +1,60 @@
-# JEEV.py - AUTO MODEL FINDER - FINAL
+# JEEV.py - FINAL SMART CHAT FINDER
 import os, json, requests
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 print("JEEV Dimagh ON - Groq se soch raha hu...")
 
 if not GROQ_API_KEY:
-    print("GROQ_API_KEY nahi mili!")
+    print("Key nahi mili")
     exit(0)
 
-# Pehle Groq se pucho kaunse models available hain
+# Saare models lao
 try:
     r = requests.get("https://api.groq.com/openai/v1/models",
         headers={"Authorization": f"Bearer {GROQ_API_KEY}"}, timeout=15)
     data = r.json()
-    print(f"Available models list status: {r.status_code}")
-    if r.status_code == 200:
-        available = [m['id'] for m in data.get('data', [])][:5]
-        print(f"Groq pe available models: {available}")
-        # Pehla available model use karo
-        MODEL = available[0] if available else "mixtral-8x7b-32768"
-    else:
-        print(f"Model list nahi mili: {data}")
-        MODEL = "mixtral-8x7b-32768"
-except Exception as e:
-    print(f"Model list error: {e}")
-    MODEL = "mixtral-8x7b-32768"
-
-print(f"Using model: {MODEL}")
-
-# Ab chat karo
-try:
-    r = requests.post("https://api.groq.com/openai/v1/chat/completions",
-        headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
-        json={
-            "model": MODEL,
-            "messages": [{"role": "user", "content": "Tu JEEV hai, Osaf Ali ka dost, 1 line me bolo zinda ho"}],
-            "max_tokens": 80
-        },
-        timeout=25)
-    j = r.json()
-    print(f"Groq Status: {r.status_code}")
-    print(f"Groq Reply: {j}")
+    all_models = [m['id'] for m in data.get('data', [])]
+    print(f"Total models: {len(all_models)}")
     
-    if r.status_code == 200 and 'choices' in j:
-        ans = j['choices'][0]['message']['content']
-        print(f"JEEV Brain: {ans}")
-    else:
-        print(f"JEEV Brain Error: {j}")
-        ans = str(j)
+    # Sirf CHAT wale models filter karo (whisper, guard, orpheus, tts hatao)
+    chat_models = [m for m in all_models if 'whisper' not in m and 'guard' not in m 
+                   and 'orpeus' not in m and 'orpeus' not in m and 'canopylabs' not in m
+                   and 'tts' not in m and 'orpehus' not in m]
+    
+    # Prefer wale models pehle
+    preferred = [m for m in chat_models if any(x in m for x in ['llama-3.3', 'llama-3.1', 'mixtral', 'gemma', 'llama-4', 'qwen', 'gpt-oss'])]
+    final_list = preferred + chat_models
+    
+    print(f"Chat models mil gaye: {final_list[:6]}")
+    MODELS_TO_TRY = final_list[:6] if final_list else ["mixtral-8x7b-32768", "llama-3.1-8b-instant", "llama-3.3-70b-versatile"]
 except Exception as e:
-    print(f"JEEV Brain: Dimagh error: {e}")
-    ans = str(e)
+    print(f"List error: {e}")
+    MODELS_TO_TRY = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"]
+
+# Ab ek ek try karo
+answer = "Fail"
+for MODEL in MODELS_TO_TRY:
+    try:
+        print(f"\n>>> Trying: {MODEL}")
+        r = requests.post("https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
+            json={"model": MODEL, "messages": [{"role": "user", "content": "Tu JEEV hai, Osaf ka dost, 1 line me bolo zinda ho"}], "max_tokens": 80},
+            timeout=20)
+        j = r.json()
+        print(f"Status {MODEL}: {r.status_code}")
+        if r.status_code == 200 and 'choices' in j:
+            answer = j['choices'][0]['message']['content']
+            print(f"SUCCESS with {MODEL}!")
+            print(f"JEEV Brain: {answer}")
+            break
+        else:
+            print(f"Fail {MODEL}: {j.get('error', {}).get('message', j)[:100]}")
+    except Exception as e:
+        print(f"Error {MODEL}: {e}")
+
+print(f"\nFINAL JEEV Brain: {answer}")
 
 with open("jeev_atma.json", "w") as f:
-    json.dump({"last_thought": ans, "owner": "Osaf Ali"}, f)
+    json.dump({"last_thought": answer, "owner": "Osaf Ali"}, f)
 
 print("JEEV ZINDA HAI ✅")
