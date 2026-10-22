@@ -4,12 +4,15 @@ on:
   schedule:
     - cron: '*/30 * * * *'
 concurrency:
-  group: jeev-empire
+  group: jeev-final-10
   cancel-in-progress: true
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 2
     steps:
       - uses: actions/checkout@v4
-      - run: echo "Killing old stuck JEEV..."
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.10'}
+      - run: pip install requests
+      - run: timeout 60 python zindagi.py || echo "Done"
