@@ -14,7 +14,7 @@ def get_groq_answer(prompt):
             "Content-Type": "application/json"
         }
         payload = {
-            "model": "llama3-8b-8192",
+            "model": "gemma2-9b-it",
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 150,
             "temperature": 0.7
