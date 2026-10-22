@@ -10,24 +10,5 @@ jobs:
         with:
           python-version: '3.10'
       - run: pip install requests
-      - name: Check and Run
-        run: |
-          echo "=== Files in repo ==="
-          ls -la
-          echo "=== Content of zindagi.py (first 5 lines) ==="
-          head -5 zindagi.py || echo "FILE NOT FOUND - Creating new one"
-          if [ ! -f zindagi.py ]; then
-            echo "Creating zindagi.py..."
-            cat > zindagi.py << 'EOF'
-            import json
-            print("=== JEEV DEMO RUNNING ===")
-            data = {"balance": 100, "osaf_earning": 25, "jeev_life_fund": 5, "status": "GREEN"}
-            with open("jeev_wallet.json", "w") as f:
-                json.dump(data, f)
-            print(f"Wallet created: {data}")
-            print("=== SUCCESS - Osaf bhai ka demo GREEN ===")
-            EOF
-          fi
-          python zindagi.py
-          echo "=== After run ==="
-          cat jeev_wallet.json || echo "No wallet"
+      - run: ls -la
+      - run: python zindagi.py
