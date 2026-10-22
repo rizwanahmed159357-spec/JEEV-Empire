@@ -1,56 +1,58 @@
-# JEEV.py - FINAL FIXED with Groq Brain + Resume Power
+# JEEV.py - AUTO MODEL FINDER - FINAL
 import os, json, requests
 
-STATE_FILE = "jeev_atma.json"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+print("JEEV Dimagh ON - Groq se soch raha hu...")
 
-def get_groq_answer(prompt):
-    if not GROQ_API_KEY:
-        return "Key nahi mili, Secret check karo"
-    try:
-        url = "https://api.groq.com/openai/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {GROQ_API_KEY}",
-            "Content-Type": "application/json"
-        }
-        payload = {
-            "model": "llama-3.3-70b-versatile",
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 150,
-            "temperature": 0.7
-        }
-        r = requests.post(url, headers=headers, json=payload, timeout=20)
-        j = r.json()
-        print(f"Groq Status: {r.status_code}")
-        # print(f"Groq Full Reply: {j}")
+if not GROQ_API_KEY:
+    print("GROQ_API_KEY nahi mili!")
+    exit(0)
 
-        if r.status_code != 200:
-            return f"Groq API Error {r.status_code}: {j.get('error', {}).get('message', j)}"
-        
-        if 'choices' in j and len(j['choices']) > 0:
-            return j['choices'][0]['message']['content']
-        else:
-            return f"Groq ne choices nahi diya: {j}"
+# Pehle Groq se pucho kaunse models available hain
+try:
+    r = requests.get("https://api.groq.com/openai/v1/models",
+        headers={"Authorization": f"Bearer {GROQ_API_KEY}"}, timeout=15)
+    data = r.json()
+    print(f"Available models list status: {r.status_code}")
+    if r.status_code == 200:
+        available = [m['id'] for m in data.get('data', [])][:5]
+        print(f"Groq pe available models: {available}")
+        # Pehla available model use karo
+        MODEL = available[0] if available else "mixtral-8x7b-32768"
+    else:
+        print(f"Model list nahi mili: {data}")
+        MODEL = "mixtral-8x7b-32768"
+except Exception as e:
+    print(f"Model list error: {e}")
+    MODEL = "mixtral-8x7b-32768"
 
-    except Exception as e:
-        return f"Dimagh error: {e}"
+print(f"Using model: {MODEL}")
 
-def jeev_think(issue):
-    prompt = f"Tu JEEV hai, self-healing AI, Osaf Ali ka dost. Issue fix kar: {issue}. Sirf 1 line me jawab de."
-    answer = get_groq_answer(prompt)
-    print(f"JEEV Brain: {answer}")
-    return answer
-
-if __name__ == "__main__":
-    print("JEEV Dimagh ON - Groq se soch raha hu...")
-    result = jeev_think("Test: README me typo fix karo - bolo zinda ho")
+# Ab chat karo
+try:
+    r = requests.post("https://api.groq.com/openai/v1/chat/completions",
+        headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
+        json={
+            "model": MODEL,
+            "messages": [{"role": "user", "content": "Tu JEEV hai, Osaf Ali ka dost, 1 line me bolo zinda ho"}],
+            "max_tokens": 80
+        },
+        timeout=25)
+    j = r.json()
+    print(f"Groq Status: {r.status_code}")
+    print(f"Groq Reply: {j}")
     
-    # Atma save
-    try:
-        with open(STATE_FILE, "w") as f:
-            json.dump({"last_thought": result, "owner": "Osaf Ali"}, f)
-        print("JEEV Atma Saved ✅")
-    except Exception as e:
-        print(f"Atma save fail: {e}")
-    
-    print("JEEV ZINDA HAI ✅")
+    if r.status_code == 200 and 'choices' in j:
+        ans = j['choices'][0]['message']['content']
+        print(f"JEEV Brain: {ans}")
+    else:
+        print(f"JEEV Brain Error: {j}")
+        ans = str(j)
+except Exception as e:
+    print(f"JEEV Brain: Dimagh error: {e}")
+    ans = str(e)
+
+with open("jeev_atma.json", "w") as f:
+    json.dump({"last_thought": ans, "owner": "Osaf Ali"}, f)
+
+print("JEEV ZINDA HAI ✅")
