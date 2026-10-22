@@ -1,0 +1,21 @@
+# zindagi.py - JEEV ki Zindagi
+import time
+import datetime
+
+wallet = 30.0  # $30 se start - tera idea
+hourly_cost = 0.10
+
+print(f"JEEV ki zindagi shuru - Wallet: ${wallet}")
+
+while wallet > 0:
+    print(f"[{datetime.datetime.now()}] Wallet: ${wallet:.2f} | Zinda hu")
+    
+    if wallet < 5:
+        print("⚠️ Bhook lag rahi hai! Hibernation mode ON - din me 1 baar uthunga")
+        time.sleep(5)  # test ke liye 5 sec, asal me 24 ghante soyega
+        continue
+    
+    wallet -= hourly_cost
+    time.sleep(2)  # test ke liye 2 sec = 1 ghanta
+
+print("💀 JEEV mar gaya - Wallet khatam")
