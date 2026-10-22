@@ -15,11 +15,10 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.10'}
       - run: pip install requests
-      - run: timeout 60 python zindagi.py || echo "Done"
-      - name: Save wallet and bots
+      - run: python zindagi.py
+      - name: Show Wallet
         run: |
-          git config --global user.name "JEEV Bot"
-          git config --global user.email "jeev@bot.com"
-          git add jeev_wallet.json jeev_bots.json jeev_atma.json || echo "No files"
-          git diff --cached --quiet || git commit -m "JEEV Update: Osaf wallet + bots"
-          git push || echo "Push done"
+          echo "=== WALLET ==="
+          cat jeev_wallet.json || echo "No wallet yet"
+          echo "=== BOTS ==="
+          cat jeev_bots.json || echo "No bots yet"
