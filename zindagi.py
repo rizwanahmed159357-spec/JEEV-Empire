@@ -141,5 +141,7 @@ try:
     with open("JEEV-Empire/JEEV_FINAL_REPORT.md", "w", encoding="utf-8") as f:
         f.write(content)
 except: pass
-
+print("\n\n--- FINAL REPORT ---\n")
+print(content)
+print("\n--- END REPORT ---\n")
 print("✅ PROCESS COMPLETE - Autonomous Report Compiled Successfully!")
