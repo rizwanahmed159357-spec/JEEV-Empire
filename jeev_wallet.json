@@ -1,10 +1,10 @@
 {
-  "total_earned": 30,
-  "balance": 23,
-  "osaf_earning": 7,
-  "jeev_life_fund": 1,
-  "bots": 1,
-  "bots_active": 1,
+  "total_earned": 60,
+  "balance": 46,
+  "osaf_earning": 14,
+  "jeev_life_fund": 2,
+  "bots": 2,
+  "bots_active": 2,
   "last_status": "ONLINE",
-  "last_run": "2026-10-24T05:34:14.529548"
+  "last_run": "2026-10-24T05:35:10.942832"
 }
