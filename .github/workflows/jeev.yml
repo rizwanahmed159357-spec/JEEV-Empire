@@ -1,3 +1,4 @@
+
 name: JEEV Empire
 on:
   workflow_dispatch:
@@ -10,7 +11,4 @@ jobs:
         with:
           python-version: '3.10'
       - run: pip install requests
-      - run: |
-          ls -la
-          ls -b
-          python3 zindagi.py
+      - run: python3 zindagi.py
