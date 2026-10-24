@@ -1,25 +1,30 @@
-name: JEEV Empire
-on:
-  workflow_dispatch:
+name: JEEV Empire Run
 
-permissions:
-  contents: write
+on:
+  push:
+  workflow_dispatch:
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - run: pip install requests
-      - run: python3 zindagi.py
 
-      - name: Save Wallet Permanently
+      - name: Install dependencies
         run: |
-          git config user.name "JEEV Bot"
-          git config user.email "jeev@empire.com"
-          git add jeev_wallet.json
-          git commit -m "JEEV: Total $30 added" || echo "Nothing to commit"
-          git push
+          python -m pip install --upgrade pip
+          pip install groq requests
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run zindagi.py
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python zindagi.py
