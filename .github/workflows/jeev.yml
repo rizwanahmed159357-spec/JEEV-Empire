@@ -1,5 +1,8 @@
 name: JEEV Empire Run
 
+permissions:
+  contents: write
+
 on:
   push:
   workflow_dispatch:
@@ -9,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -37,15 +40,17 @@ jobs:
           fi
 
       - name: Commit and Push Report
-        if: success()
+        if: always()
         run: |
           git config --global user.name "JEEV AI Bot"
           git config --global user.email "jeev-bot@github.com"
           if [ -f "JEEV-Empire/JEEV_FINAL_REPORT.md" ]; then
             cp JEEV-Empire/JEEV_FINAL_REPORT.md ./JEEV_FINAL_REPORT.md || true
           fi
-          git add JEEV_FINAL_REPORT.md JEEV-Empire/JEEV_FINAL_REPORT.md jeev_wallet.json JEEV-Empire/jeev_wallet.json || true
-          git commit -m "🤖 JEEV DeepSeek Report - $(date)" || echo "Nothing to commit"
+          ls -la *.md || true
+          ls -la JEEV-Empire/*.md || true
+          git add -A
+          git commit -m "🤖 JEEV Report - $(date)" || echo "Nothing to commit"
           git push || (git pull --rebase && git push) || true
 
       - name: Send Success Email
@@ -57,13 +62,13 @@ jobs:
           secure: true
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🚨 JEEV AI (DeepSeek) - Report Ready!"
+          subject: "🚨 JEEV AI (Solidity) - Report Ready!"
           to: ${{ secrets.EMAIL_USERNAME }}
           from: JEEV AI Bot <${{ secrets.EMAIL_USERNAME }}>
           html_body: |
             <html><body>
-            <h2>🚨 JEEV AI - DeepSeek R1 Report Ready!</h2>
-            <p><b>Report:</b> <a href="https://github.[STRIPPED 66 bytes].md">GitHub Report Link</a></p>
-            <p>Model: deepseek/deepseek-r1:free</p>
+            <h2>🚨 JEEV AI - Solidity Report Ready!</h2>
+            <p><b>Report:</b> <a href="https://github.com/JEEV-Empire/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md">GitHub Report Link</a></p>
+            <p>Model: Solidity Scanner Active</p>
             <p>File GitHub pe push ho gayi hai!</p>
             </body></html>
