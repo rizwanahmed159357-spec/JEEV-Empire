@@ -3,19 +3,19 @@ import requests
 import glob
 import json
 
-# Key GitHub Secret se ayegi
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 if not API_KEY:
-    print("❌ ERROR: OPENROUTER_API_KEY nahi mili GitHub Secrets me!")
+    print("❌ ERROR: OPENROUTER_API_KEY nahi mili! Pehle GitHub Secrets me set karo.")
     exit(1)
 
-# MODELS LIST - Priority Wise
+# 2026 ke active free models pipeline
 MODELS = [
-    "deepseek/deepseek-r1:free",
-    "deepseek/deepseek-chat:free",
-    "meta-llama/llama-3.1-8b-instruct:free",
-    "google/gemma-2-9b-it:free"
+    "openrouter/free",
+    "meta-llama/llama-3.3-70b-instruct:free",
+    "openai/gpt-oss-120b:free",
+    "qwen/qwen3-coder:free",
+    "deepseek/deepseek-chat-v3-0324:free"
 ]
 
 headers = {
@@ -25,156 +25,121 @@ headers = {
     "X-Title": "JEEV-Empire"
 }
 
-print("🧠 JEEV AUTO-BRAIN START - Advanced Security Scanning Engine")
+print("🧠 JEEV AUTO-BRAIN V3 - 2026 Hacking Engine Active")
 
-# --- DUNYA KI SAB SE MUSHKIL PROBLEM SIMULATION ---
-# Yeh core logic memory corruption aur logical bypass ka combination hai
+# --- SIMULATION OF WORLD'S HARDEST BUG PROGRAM ---
 hardest_problem_simulation = """
-# --- FILE: core/security_kernel.py ---
-# SYSTEM ROOT PRIVILEGE LOGICAL KERNEL CONNECTOR
+# --- FILE: financial_core/vault_oracle.py ---
+# PRIVILEGED LIQUIDITY POOL & DYNAMIC PRICING ENGINE
 
-import ctypes
-import struct
+class LiquidityVaultBridge:
+    def __init__(self, token_balances, external_oracle):
+        self.balances = token_balances
+        self.oracle = external_oracle
+        self.is_locked = False
 
-class AdvancedKernelBridge:
-    def __init__(self, raw_buffer):
-        self.buffer = raw_buffer  # User-controlled raw network packet bytes
+    def withdraw_and_sync_yield(self, user, amount):
+        # ⚠️ CRITICAL MEGA-VALUABLE EXPLOIT FOUND HERE:
+        # Cross-Contract Reentrancy combined with Spot Price Manipulation Flaw.
+        
+        user_balance = self.balances.get(user, 0)
+        if user_balance < amount:
+            return False
 
-    def process_system_packet(self):
-        # ⚠️ CRITICAL WORLD-CLASS ZERO-DAY FLAW:
-        # 1. Integer Underflow leads to Heap Buffer Overflow via ctypes manipulation.
-        # 2. Arbitrary Memory Write (Write-What-Where primitive) via unsanitized header length.
+        payment_status = self.oracle.trigger_external_transfer(user, amount)
         
-        if len(self.buffer) < 8:
-            return False
+        if payment_status:
+            self.balances[user] -= amount
+            current_pool_ratio = self.balances["token_a"] / self.balances["token_b"]
+            self.oracle.update_spot_price_unsafe(current_pool_ratio)
+            return True
             
-        # Packet format: [2-bytes Magic] [2-bytes Type] [4-bytes Length Indicator]
-        magic, p_type, length_indicator = struct.unpack("<HHI", self.buffer[:8])
-        
-        if magic != 0x4A45: # 'JE'
-            return False
-            
-        # HIGH LEVEL INTEGER UNDERFLOW Bypassing Boundary Check:
-        # Attacker sends length_indicator = 4. 
-        # 4 - 8 results in an underflow/negative wrapping in low-level memory calculation, 
-        # bypassing the size restriction check but allocated as a huge unsigned integer!
-        calculated_size = length_indicator - 8
-        
-        if calculated_size > 4096: # Logical check boundary
-            return False
-            
-        # Memory Corruption Primitive
-        # Creating a dynamic mutable buffer based on the underflowed size
-        mem_allocation = (ctypes.c_char * calculated_size)()
-        
-        # This memmove executes an Out-of-Bounds Write directly into the process heap memory,
-        # allowing an attacker to overwrite function pointers and execute arbitrary kernel payloads!
-        ctypes.memmove(mem_allocation, self.buffer[8:], len(self.buffer) - 8)
-        return True
+        return False
 """
 
-# Dynamic scanning simulation
-code_data = "\n--- File: core/security_kernel.py ---\n" + hardest_problem_simulation
+code_data = "\n--- File: financial_core/vault_oracle.py ---\n" + hardest_problem_simulation
 
-# Baki standard project files uthao (Max 2 mazeed)
 files_found = 1
 for f in glob.glob("**/*.py", recursive=True):
-    if "zindagi" in f or ".github" in f or "__pycache__" in f or "jeev" in f.lower():
+    if any(x in f for x in ["zindagi", ".github", "__pycache__"]) or "jeev" in f.lower():
         continue
     try:
         with open(f, "r", encoding="utf-8", errors="ignore") as file:
             txt = file.read()
             if len(txt) > 100:
-                code_data += f"\n--- File: {f} ---\n{txt[:2000]}"
+                code_data += f"\n--- File: {f} ---\n{txt[:1500]}"
                 files_found += 1
                 if files_found >= 3: break
-    except:
-        pass
+    except: pass
 
-# STRICT AGENT PROMPT - AI ko majboor karega HUNT ya FIX decide karne par
 prompt = f"""
-You are JEEV - An Elite Autonomous Cyber Security AI Core Operating Globally.
-
-CRITICAL CODEBASE FOR AUDIT:
+You are JEEV Security Expert. Meticulously analyze this target code architecture for severe logic bypasses, or high-value multi-million dollar exploit loops:
 {code_data}
 
-OPERATIONAL MANDATE (YOU MUST AUTO-DECIDE INTENT):
-1. Deeply analyze the code architecture for elite architectural flaws, logic bypasses, or low-level memory vulnerabilities (like Integer Underflows, Heap Corruption, RCE).
-2. AUTO-DECIDE YOUR MODE:
-   - FIX MODE: Activate ONLY if the bugs are trivial, syntax-based, or non-exploitable logic mistakes.
-   - HUNT MODE: Activate MANDATORILY if you discover high-impact vulnerabilities capable of full machine/process takeover (Bug Bounty Target).
+OPERATIONAL AUTOMATION RULES:
+1. AUTO-DECIDE: If it's a routine syntax error, switch to FIX MODE. If it's a catastrophic economic/security vulnerability, switch to HUNT MODE.
+2. Output structural format must be a highly technical professional English report containing:
+   - Vulnerability Type & Execution Severity
+   - Complete Threat Impact Analysis
+   - Step-by-Step Proof of Concept (PoC) script logic
+   - Corrected, secure remediation patch implementing industry standard security patterns.
+3. Your absolute final output line MUST be exactly: MANUAL ACTION REQUIRED: Please submit manually to program.
 
-OUTPUT STRUCTURAL RULES:
-- IF FIX MODE: Provide the patched secure code + Technical analysis + End exactly with: MANUAL ACTION REQUIRED: Please submit manually to program.
-- IF HUNT MODE: Generate a world-class cryptographic/exploit bug bounty report containing:
-  1. Executive Summary & Flaw Classification (e.g., Integer Underflow to Out-of-Bounds Write)
-  2. Attack Vector & Deep Technical Impact
-  3. Mathematical Proof of Concept (PoC) illustrating buffer corruption calculation
-  4. Complete Remediation (The fully refactored secure Python/ctypes code)
-  5. The exact final line: MANUAL ACTION REQUIRED: Please submit manually to program.
-
-Strictly write the response in ENGLISH ONLY. No conversational greetings or filler text.
+Provide only the report in technical English language. Do not talk back or greet.
 """
 
 content = None
-last_error = None
+last_err = None
 
 for MODEL in MODELS:
     try:
-        print(f"--> Trying MODEL: {MODEL}")
-        payload = {
-            "model": MODEL,
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 4000
-        }
-        r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=120)
+        print(f"--> Trying: {MODEL}")
+        r = requests.post("https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json={
+                "model": MODEL, 
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 3000
+            },
+            timeout=120)
         
-        if r.status_code != 200:
-            print(f"❌ {MODEL} HTTP Error: {r.status_code}")
-            last_error = f"HTTP {r.status_code}: {r.text}"
+        try:
+            data = r.json()
+        except Exception as json_err:
+            last_err = f"Invalid JSON response structure: {json_err}"
             continue
-            
-        data = r.json()
+
+        print(f"API says: {str(data)[:300]}")
         
-        if 'choices' in data and len(data['choices']) > 0:
-            content = data['choices'][0]['message']['content']
+        if "choices" in data and len(data["choices"]) > 0:
+            content = data["choices"][0]["message"]["content"]
             print(f"✅ SUCCESS with {MODEL}")
             break
         else:
-            print(f"❌ {MODEL} FAILED - Bad response structure")
-            last_error = json.dumps(data)
-            continue
-            
+            err_msg = data.get("error", {}).get("message", "Pipeline structure failure")
+            last_err = f"Model {MODEL} error response: {err_msg}"
     except Exception as e:
-        print(f"❌ Exception with {MODEL}: {e}")
-        last_error = str(e)
-        continue
+        print(f"Error executing model request: {e}")
+        last_err = str(e)
 
-# Fallback Report Generation
 if not content:
-    content = f"""# JEEV AUTO-REPORT - API PIPELINE FAILED
+    content = f"""# JEEV SYSTEM AUDIT REPORT - API CHANNELS SATURATED
 
-All models exhausted without success. 
-
-## Technical Error State
-{last_error}
+## Diagnostic Error State
+{last_err}
 
 ## MANUAL ACTION REQUIRED
-1. Verify OpenRouter Account Balance & Credits.
-2. Ensure the API key has access permissions for deepseek-r1.
-3. Review target codebase manually.
+1. Verify OpenRouter API key permissions for external free endpoint tiers.
+2. If OpenRouter restricts concurrent automated traffic, please allocate $5 to bypass request-per-minute limits.
 """
-
-# Reports ko safe directories me save krna
-os.makedirs("JEEV-Empire", exist_ok=True)
 
 with open("JEEV_FINAL_REPORT.md", "w", encoding="utf-8") as f:
     f.write(content)
 
-with open("JEEV-Empire/JEEV_FINAL_REPORT.md", "w", encoding="utf-8") as f:
-    f.write(content)
+try:
+    os.makedirs("JEEV-Empire", exist_ok=True)
+    with open("JEEV-Empire/JEEV_FINAL_REPORT.md", "w", encoding="utf-8") as f:
+        f.write(content)
+except: pass
 
-print("✅ DONE - Autonomous Report successfully compiled!")
-if content:
-    print("\n--- REPORT PREVIEW ---")
-    print(content[:600])
+print("✅ PROCESS COMPLETE - Autonomous Report Compiled Successfully!")
