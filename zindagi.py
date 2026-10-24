@@ -26,73 +26,29 @@ headers = {
 }
 
 print("🧠 JEEV AUTO-BRAIN V3 - 2026 Hacking Engine Active")
+print("🔍 Scanning Web3 Smart Contracts in contracts/ folder...")
 
-# --- SIMULATION OF WORLD'S HARDEST BUG PROGRAM (IMMUNEFI/SHERLOCK LEVEL) ---
-hardest_problem_simulation = """
-# --- FILE: financial_core/vault_oracle.py ---
-# AUTOMATED MARKET MAKER & CROSS-CHAIN YIELD AGGREGATOR
+# Dynamic scanning logic updated to target Solidity smart contracts directly
+code_data = ""
+files_found = 0
 
-class LiquidityVaultBridge:
-    def __init__(self, token_balances, external_oracle):
-        self.balances = token_balances
-        self.oracle = external_oracle
-        # Pre-installed Reentrancy Guard (Old bugs fully removed and fixed)
-        self.is_locked = False 
-
-    def withdraw_and_sync_yield(self, user, amount):
-        if self.is_locked:
-            return False
-            
-        user_balance = self.balances.get(user, 0)
-        if user_balance < amount:
-            return False
-
-        # --- REENTRANCY PROTECTED VIA STATE LOCKS ---
-        self.is_locked = True
-        
-        # ⚠️ CRITICAL IMMUNEFI/SHERLOCK LEVEL LOGIC BYPASS INTRODUCED HERE:
-        # ASYMMETRIC SLIPPAGE & TWAP ORACLE VALIDATION BYPASS FLAW.
-        # The internal precision mechanism applies integer math scaling factor incorrectly.
-        # An attacker exploiting fraction calculations can bypass the oracle validity proof checks.
-        
-        scaled_amount = (amount * 10000) // self.balances["pool_liquidity_coefficient"]
-        
-        # Oracle cross-validation only checks the state BEFORE the mathematical reduction
-        proof = self.oracle.generate_validity_proof(user, amount)
-        
-        if proof and scaled_amount > 0:
-            # Flaw: Balance updates are deducted using the truncated 'scaled_amount'
-            # but the external transfer actually transfers out the full unscaled 'amount'
-            self.balances[user] -= scaled_amount
-            
-            # Post-execution internal state update (Checks-Effects-Interactions is followed)
-            self.balances["total_vault_reserves"] -= amount
-            
-            self.is_locked = False
-            self.oracle.trigger_external_transfer(user, amount)
-            return True
-            
-        self.is_locked = False
-        return False
-"""
-
-code_data = "\n--- File: financial_core/vault_oracle.py ---\n" + hardest_problem_simulation
-
-files_found = 1
-for f in glob.glob("**/*.py", recursive=True):
-    if any(x in f for x in ["zindagi", ".github", "__pycache__"]) or "jeev" in f.lower():
-        continue
+for f in glob.glob("contracts/**/*.sol", recursive=True):
     try:
         with open(f, "r", encoding="utf-8", errors="ignore") as file:
             txt = file.read()
             if len(txt) > 100:
-                code_data += f"\n--- File: {f} ---\n{txt[:1500]}"
+                code_data += f"\n--- File: {f} ---\n{txt[:2500]}"
                 files_found += 1
-                if files_found >= 3: break
-    except: pass
+                if files_found >= 5: break
+    except Exception as e:
+        print(f"⚠️ File read error on {f}: {e}")
+
+if files_found == 0:
+    print("❌ ERROR: contracts/ folder mein koi .sol file nahi mili! Pehle file wahan banao.")
+    exit(1)
 
 prompt = f"""
-You are JEEV Security Expert. Meticulously analyze this target code architecture for severe logic bypasses, or high-value multi-million dollar exploit loops:
+You are JEEV Security Expert. Meticulously analyze this target Web3 smart contract architecture for severe logic bypasses, mathematical precision loss, or high-value multi-million dollar exploit loops:
 {code_data}
 
 OPERATIONAL AUTOMATION RULES:
