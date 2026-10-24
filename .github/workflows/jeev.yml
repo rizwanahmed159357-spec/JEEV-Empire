@@ -1,6 +1,10 @@
 name: JEEV Empire
 on:
   workflow_dispatch:
+
+permissions:
+  contents: write
+
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -12,11 +16,10 @@ jobs:
       - run: pip install requests
       - run: python3 zindagi.py
 
-      # YE NAYA STEP - Wallet ko permanent save karega!
-      - name: Save Wallet
+      - name: Save Wallet Permanently
         run: |
           git config user.name "JEEV Bot"
           git config user.email "jeev@empire.com"
-          git add jeev_wallet.json bots/ || true
-          git commit -m "Update wallet - JEEV earning" || echo "No changes"
-          git push || echo "Push failed"
+          git add jeev_wallet.json
+          git commit -m "JEEV: Total $30 added" || echo "Nothing to commit"
+          git push
