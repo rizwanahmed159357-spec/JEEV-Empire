@@ -10,5 +10,12 @@ jobs:
         with:
           python-version: '3.10'
       - run: pip install requests
-      - run: ls -la
-      - run: python zindagi.py
+      - name: Find and Run
+        run: |
+          pwd
+          ls -la
+          echo "--- Finding zindagi.py ---"
+          find . -name "zindagi.py"
+          FILE=$(find . -name "zindagi.py" | head -1)
+          echo "Running $FILE"
+          python "$FILE"
