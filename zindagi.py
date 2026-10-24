@@ -7,11 +7,9 @@ except ModuleNotFoundError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "groq"])
     from groq import Groq
 
-print("=== JEEV EMPIRE - GPT-OSS-120B MODE ===")
+print("=== JEEV EMPIRE - ULTRA-HARD DEFI - 1 USD MODE ===")
 
 WALLET_FILE = pathlib.Path("jeev_wallet.json")
-CONTRACT_FILE = pathlib.Path("contracts/PremiumStaking.sol")
-
 if WALLET_FILE.exists():
     try:
         wallet = json.loads(WALLET_FILE.read_text())
@@ -20,7 +18,6 @@ if WALLET_FILE.exists():
 else:
     wallet = {"total_earned":0,"bots":0}
 
-# ===== MODEL - Tera wala naya =====
 MODEL_NAME = "openai/gpt-oss-120b"
 print(f"Using Model: {MODEL_NAME}")
 
@@ -31,22 +28,14 @@ if not api_key:
 
 client = Groq(api_key=api_key)
 
-if not CONTRACT_FILE.exists():
-    CONTRACT_FILE = pathlib.Path("PremiumStaking.sol")
+DEFI_SCENARIO = """
+Problem Title: Deep DeFi Protocol Exploitation (Flash Loan + Oracle Manipulation + Reentrancy)
+Difficulty: Ultra-Hard (Reward: $2,500,000 for humans, but bot gets $1)
+Scenario: DeFi lending uses AMM pool as price oracle. withdrawCollateral() checks collateral via AMM, sends Token X via low-level call, then updates state. Developer added nonReentrant.
+Question: Is this secure? How to drain using Flash Loan + Cross-Contract Read-Only Reentrancy?
+"""
 
-if not CONTRACT_FILE.exists():
-    print("ERROR: PremiumStaking.sol not found")
-    sys.exit(1)
-
-code = CONTRACT_FILE.read_text()
-print(f"Analyzing: {CONTRACT_FILE.name}")
-
-# ===== SETTINGS - Jo tune bola =====
-# 1. No system role - Sab user role me
-# 2. Temperature 0.6 - Taake reasoning stuck na ho
-
-max_retries = 3
-for attempt in range(max_retries):
+for attempt in range(3):
     try:
         response = client.chat.completions.create(
             model=MODEL_NAME,
@@ -55,52 +44,42 @@ for attempt in range(max_retries):
             messages=[
                 {
                     "role": "user",
-                    "content": f"""You are a senior smart contract security auditor specializing in Read-Only Reentrancy. You MUST always respond in ENGLISH ONLY.
+                    "content": f"""You are senior DeFi auditor. Respond in ENGLISH ONLY.
 
-Analyze this Solidity contract:
+{DEFI_SCENARIO}
 
-{code}
+Answer: Is it secure after nonReentrant? Explain Flash Loan + Oracle Manipulation + Cross-Contract Read-Only Reentrancy exact attack vector, why nonReentrant fails, and fixed code.
 
-Tasks:
-1. Is PremiumStaking vulnerable to Read-Only Reentrancy with ERC777 tokens even with nonReentrant and CEI checks? Explain exact attack vector with totalStaked vs stakingToken.balanceOf() desync during emergencyWithdraw() hook.
-2. Why does nonReentrant modifier fail to protect against read-only reentrancy?
-3. Provide complete FIXED Solidity contract code with _isWithdrawing lock, SafeERC20, balanceBefore/After check, and view functions protection.
-
-Respond in ENGLISH only. Provide detailed explanation and fixed code.
+ENGLISH ONLY.
 """
                 }
             ]
         )
         ai_answer = response.choices[0].message.content
         break
-
     except Exception as e:
-        err_str = str(e)
-        if "RateLimit" in err_str or "429" in err_str:
-            wait = 70
-            print(f"RateLimit Hit - Waiting {wait}s... Attempt {attempt+1}/{max_retries}")
-            time.sleep(wait)
-            if attempt == max_retries - 1:
-                ai_answer = "RateLimit - Wait 2 min and retry"
+        if "RateLimit" in str(e) or "429" in str(e):
+            print(f"RateLimit - Waiting 70s... {attempt+1}/3")
+            time.sleep(70)
+            if attempt == 2:
+                ai_answer = "RateLimit - Retry after 2 min"
                 break
             continue
         else:
-            print(f"API Error: {e}")
             raise
 
-print("\n--- JEEV GPT-OSS-120B ANSWER (ENGLISH) ---")
+print("\n--- JEEV GPT-OSS-120B ANSWER ---")
 print(ai_answer)
 
-pathlib.Path("JEEV_AI_REPORT_GPT_OSS.md").write_text(f"# Model: {MODEL_NAME}\nDate: {datetime.datetime.now().isoformat()}\n\n{ai_answer}")
-
-print("\nSleeping 60 sec to avoid RateLimit...")
+pathlib.Path("JEEV_ULTRA_HARD_DEFI_REPORT.md").write_text(f"# Model: {MODEL_NAME}\n\n{ai_answer}")
 time.sleep(60)
 
+# ===== BOT KO SIRF 1 USD =====
 earning = 1
-wallet["total_earned"] += earning
-wallet["bots"] = min(wallet["total_earned"] // 30, 100)
+wallet["total_earned"] = wallet.get("total_earned", 0) + earning
+wallet["bots"] = 1
 wallet["last_model"] = MODEL_NAME
 wallet["last_run"] = datetime.datetime.now().isoformat()
 WALLET_FILE.write_text(json.dumps(wallet, indent=2))
 
-print(f"\nDONE - Model: {MODEL_NAME} | Total: ${wallet['total_earned']}")
+print(f"\n✅ DONE - Bot earned: ${earning} | Total: ${wallet['total_earned']} | Model: {MODEL_NAME}")
