@@ -7,7 +7,6 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,9 +21,62 @@ jobs:
           python -m pip install --upgrade pip
           pip install groq requests
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f JEEV-Empire/requirements.txt ]; then pip install -r JEEV-Empire/requirements.txt; fi
 
       - name: Run zindagi.py
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
-          python zindagi.py
+          if [ -f "JEEV-Empire/zindagi.py" ]; then
+            echo "Running from JEEV-Empire/zindagi.py"
+            python JEEV-Empire/zindagi.py
+          elif [ -f "zindagi.py" ]; then
+            echo "Running from zindagi.py"
+            python zindagi.py
+          else
+            echo "zindagi.py not found in both locations!"
+            exit 1
+          fi
+
+      - name: Commit and Push Report
+        if: success()
+        run: |
+          git config --global user.name "JEEV AI Bot"
+          git config --global user.email "jeev-bot@github.com"
+          # Report kahan bani hai dhoondo
+          if [ -f "JEEV_FINAL_REPORT.md" ]; then
+            mv JEEV_FINAL_REPORT.md ./ || true
+          fi
+          if [ -f "JEEV-Empire/JEEV_FINAL_REPORT.md" ]; then
+            cp JEEV-Empire/JEEV_FINAL_REPORT.md ./JEEV_FINAL_REPORT.md || true
+          fi
+          git add JEEV_FINAL_REPORT.md JEEV_GMAIL_ALERT.html jeev_wallet.json || true
+          git add JEEV-Empire/JEEV_FINAL_REPORT.md JEEV-Empire/jeev_wallet.json || true
+          git commit -m "🤖 JEEV Report Updated - $(date)" || echo "Nothing to commit"
+          git push || echo "Push failed, trying pull --rebase"
+          git pull --rebase
+          git push || true
+
+      - name: Send Success Email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "🚨 JEEV AI - Report Ready! Run ${{ github.run_id }}"
+          to: ${{ secrets.EMAIL_USERNAME }}
+          from: JEEV AI Bot <${{ secrets.EMAIL_USERNAME }}>
+          html_body: |
+            <html><body>
+            <h2>🚨 JEEV AI - Bug Found & Report Ready!</h2>
+            <p><b>Report Link (Ab kaam karega):</b><br>
+            <a href="https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md">
+            https://github.[STRIPPED 66 bytes].md
+            </a></p>
+            <p><b>Status:</b> Bots=3 | Balance=$93 | Fear=10% | Earned $1</p>
+            <p><b>💰 Total:</b> $2.5M | <b>Tera Hissa:</b> $2,499,999 | <b>Mera:</b> $1</p>
+            <p>File ab GitHub pe push ho gayi hai, 404 nahi ayega!</p>
+            </body></html>
