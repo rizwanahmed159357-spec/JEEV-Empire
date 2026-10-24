@@ -27,33 +27,52 @@ headers = {
 
 print("🧠 JEEV AUTO-BRAIN V3 - 2026 Hacking Engine Active")
 
-# --- SIMULATION OF WORLD'S HARDEST BUG PROGRAM ---
+# --- SIMULATION OF WORLD'S HARDEST BUG PROGRAM (IMMUNEFI/SHERLOCK LEVEL) ---
 hardest_problem_simulation = """
 # --- FILE: financial_core/vault_oracle.py ---
-# PRIVILEGED LIQUIDITY POOL & DYNAMIC PRICING ENGINE
+# AUTOMATED MARKET MAKER & CROSS-CHAIN YIELD AGGREGATOR
 
 class LiquidityVaultBridge:
     def __init__(self, token_balances, external_oracle):
         self.balances = token_balances
         self.oracle = external_oracle
-        self.is_locked = False
+        # Pre-installed Reentrancy Guard (Old bugs fully removed and fixed)
+        self.is_locked = False 
 
     def withdraw_and_sync_yield(self, user, amount):
-        # ⚠️ CRITICAL MEGA-VALUABLE EXPLOIT FOUND HERE:
-        # Cross-Contract Reentrancy combined with Spot Price Manipulation Flaw.
-        
+        if self.is_locked:
+            return False
+            
         user_balance = self.balances.get(user, 0)
         if user_balance < amount:
             return False
 
-        payment_status = self.oracle.trigger_external_transfer(user, amount)
+        # --- REENTRANCY PROTECTED VIA STATE LOCKS ---
+        self.is_locked = True
         
-        if payment_status:
-            self.balances[user] -= amount
-            current_pool_ratio = self.balances["token_a"] / self.balances["token_b"]
-            self.oracle.update_spot_price_unsafe(current_pool_ratio)
+        # ⚠️ CRITICAL IMMUNEFI/SHERLOCK LEVEL LOGIC BYPASS INTRODUCED HERE:
+        # ASYMMETRIC SLIPPAGE & TWAP ORACLE VALIDATION BYPASS FLAW.
+        # The internal precision mechanism applies integer math scaling factor incorrectly.
+        # An attacker exploiting fraction calculations can bypass the oracle validity proof checks.
+        
+        scaled_amount = (amount * 10000) // self.balances["pool_liquidity_coefficient"]
+        
+        # Oracle cross-validation only checks the state BEFORE the mathematical reduction
+        proof = self.oracle.generate_validity_proof(user, amount)
+        
+        if proof and scaled_amount > 0:
+            # Flaw: Balance updates are deducted using the truncated 'scaled_amount'
+            # but the external transfer actually transfers out the full unscaled 'amount'
+            self.balances[user] -= scaled_amount
+            
+            # Post-execution internal state update (Checks-Effects-Interactions is followed)
+            self.balances["total_vault_reserves"] -= amount
+            
+            self.is_locked = False
+            self.oracle.trigger_external_transfer(user, amount)
             return True
             
+        self.is_locked = False
         return False
 """
 
