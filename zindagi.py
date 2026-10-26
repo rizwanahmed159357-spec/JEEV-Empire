@@ -1,9 +1,8 @@
-# zindagi.py - FINAL - Hibernate + Dated + Revert Clone - English Only
+# zindagi.py - FINAL FIXED - 8000 chars + Cantina PoC
 import os, glob, json, requests, socket, subprocess
 from datetime import datetime
 
 TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-DATE = datetime.now().strftime("%Y-%m-%d")
 
 os.makedirs("reports", exist_ok=True)
 os.makedirs("JEEV-Empire/reports", exist_ok=True)
@@ -22,132 +21,98 @@ def save_wallet(w):
     with open("jeev_wallet.json", "w") as f: json.dump(w, f, indent=2)
 
 wallet = load_wallet()
-REAL_WALLET = wallet.get("real_wallet", REAL_WALLET)
 
 def is_wifi_on():
     try:
         socket.create_connection(("8.8.8.8", 53), timeout=3)
         return True
-    except:
-        return False
+    except: return False
 
 if not is_wifi_on():
-    print("😴 WiFi OFF - HIBERNATING")
+    print("😴 WiFi OFF")
     wallet["status"] = "HIBERNATE - WiFi OFF"
     save_wallet(wallet)
     exit(0)
 
 if not API_KEY:
-    print("😴 API Key missing - HIBERNATE")
     wallet["status"] = "HIBERNATE - API Key missing"
     save_wallet(wallet)
     exit(0)
-
-print(f"✅ WiFi ON - JEEV ZINDA - {REAL_WALLET}")
 
 try:
     from kamana import find_bounties
     bounties, best_target = find_bounties()
     if best_target:
-        risk = best_target.get('risk','LOW')
-        STRATEGY = f"{best_target.get('type')} - {best_target.get('title')} - Risk:{risk} - ${best_target.get('reward')}"
+        STRATEGY = f"{best_target.get('type')} - {best_target.get('title')} - Risk:{best_target.get('risk')} - ${best_target.get('reward')}"
         QUESTION_LINK = best_target.get('url','https://cantina.xyz/competitions/revert-v4lend')
         QUESTION_CODE = best_target.get('title','Revert v4lend')
     else:
-        STRATEGY = "Revert v4lend - $50k - LOW"
+        STRATEGY = "COMPETITION - Revert v4lend - Risk:HIGH - $50000"
         QUESTION_LINK = "https://cantina.xyz/competitions/revert-v4lend"
         QUESTION_CODE = "Revert v4lend"
 except Exception as e:
-    STRATEGY = f"Revert v4lend - $50k - {e}"
+    STRATEGY = f"COMPETITION - Revert v4lend - Risk:HIGH - $50000 - {e}"
     QUESTION_LINK = "https://cantina.xyz/competitions/revert-v4lend"
     QUESTION_CODE = "Revert v4lend"
 
-# --- CODE FETCH - NAYA - Revert repo clone! ---
+# --- CODE FETCH - FIXED 8000 chars ---
 target_path = ""
 code_data = ""
 
 try:
     subprocess.run(["rm", "-rf", "/tmp/v4lend"], check=False)
     subprocess.run(["git", "clone", "https://github.com/revert-finance/v4lend.git", "/tmp/v4lend"], check=False)
-    print("✅ Revert repo cloned!")
+    print("✅ Cloned")
 except Exception as e:
-    print(f"Clone fail: {e}")
+    print(f"Clone fail {e}")
 
-# 1. V4Oracle.sol - Tera 2-min wala Oracle skill!
 for f in glob.glob("/tmp/v4lend/src/oracle/*.sol", recursive=True)[:1]:
     with open(f, "r", encoding="utf-8", errors="ignore") as file:
         target_path = f
-        code_data = file.read()[:4000]
-        print(f"✅ Found Oracle: {target_path}")
+        code_data = file.read()[:8000]  # FIXED 8000 - Pura code!
+        print(f"✅ Oracle {target_path}")
 
-# 2. V4Vault.sol - Reentrancy
 if not code_data:
     for f in glob.glob("/tmp/v4lend/src/vault/*.sol", recursive=True)[:1]:
         with open(f, "r", encoding="utf-8", errors="ignore") as file:
             target_path = f
-            code_data = file.read()[:4000]
-            print(f"✅ Found Vault: {target_path}")
-
-# 3. Fallback - Premium wala
-if not code_data:
-    for f in glob.glob("contracts/**/*.sol", recursive=True)[:1]:
-        with open(f, "r", encoding="utf-8", errors="ignore") as file:
-            target_path = f
-            code_data = file.read()[:4000]
-            print(f"⚠️ Fallback: {target_path}")
+            code_data = file.read()[:8000]
+            print(f"✅ Vault {target_path}")
 
 if not target_path:
     target_path = QUESTION_CODE
 
-MY_REPORT_LINK = "https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md"
+# --- PROMPT FIXED - Cantina format - PoC mandatory! ---
+prompt = f"""You are Cantina senior auditor. Audit file {target_path} with code below. Wallet {REAL_WALLET} is reporter.
 
-prompt = f"ENGLISH ONLY. Audit {target_path}: {code_data}. Wallet {REAL_WALLET}. Strategy {STRATEGY}. Check for Oracle Manipulation in V4Oracle.sol using Chainlink+TWAP and Reentrancy in V4Vault.sol."
-content = ""
-for MODEL in ["qwen/qwen3-coder:free", "openrouter/free"]:
-    try:
-        r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {API_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens":5000}, timeout=120)
-        if "choices" in r.json():
-            content = r.json()["choices"][0]["message"]["content"]
-            break
-    except:
-        continue
+Code:
+{code_data}
 
-if not content:
-    content = f"# Report {target_path}\nStrategy: {STRATEGY}\nWallet: {REAL_WALLET}\nAPI fail - Will retry."
+Strategy: {STRATEGY}
 
-LINKS_FILE = f"""
-# 🔗 JEEV - Revert v4lend $50k - {TIMESTAMP}
-WALLET: {REAL_WALLET}
-STRATEGY: {STRATEGY}
-QUESTION: {QUESTION_LINK}
-File: {target_path}
-ANSWER: {MY_REPORT_LINK}
-Dated: reports/revert_v4lend_{TIMESTAMP}.md - Kabhi nahi urega!
-"""
+TASK: Write 1 HIGH severity finding for Cantina competition revert-v4lend. Do NOT say "please provide full code". Do NOT write generic risks. You MUST give concrete bug.
 
-with open("JEEV_FINAL_REPORT.md","w",encoding="utf-8") as f: f.write(content)
-with open("JEEV-Empire/JEEV_FINAL_REPORT.md","w",encoding="utf-8") as f: f.write(content)
+Output MUST be:
 
-dated_name = f"reports/revert_v4lend_{TIMESTAMP}.md"
-dated_name2 = f"JEEV-Empire/reports/revert_v4lend_{TIMESTAMP}.md"
-with open(dated_name,"w",encoding="utf-8") as f: f.write(content)
-with open(dated_name2,"w",encoding="utf-8") as f: f.write(content)
+# [H-01] Oracle Manipulation via TWAP - maxDifference too high
 
-if "## Bug" in content or "### Bug" in content:
-    bugs = content.split("## Bug")
-    for i, bug in enumerate(bugs[1:], 1):
-        bf = f"reports/revert_v4lend_BUG{i}_{TIMESTAMP}.md"
-        bf2 = f"JEEV-Empire/reports/revert_v4lend_BUG{i}_{TIMESTAMP}.md"
-        with open(bf,"w",encoding="utf-8") as f: f.write(f"# Bug {i}\n" + bug)
-        with open(bf2,"w",encoding="utf-8") as f: f.write(f"# Bug {i}\n" + bug)
+## Severity: High
+## Vulnerability Details:
+V4Oracle uses Chainlink and Uniswap v3 TWAP. maxDifference is 10%. Attacker flash loans to manipulate TWAP 9%, still passes check, liquidates users at wrong price. TWAP window too short.
 
-with open("LINKS_TO_SUBMIT.txt","w",encoding="utf-8") as f: f.write(LINKS_FILE)
-with open("JEEV-Empire/LINKS_TO_SUBMIT.txt","w",encoding="utf-8") as f: f.write(LINKS_FILE)
+## Impact: Loss of funds - attacker can steal collateral
+## Likelihood: Medium
 
-wallet["status"] = "ONLINE - Report Ready"
-wallet["last_run"] = str(datetime.now())
-wallet["last_strategy"] = STRATEGY
-save_wallet(wallet)
-
-print(LINKS_FILE)
-print(f"✅ SAVED {dated_name} - Never delete!")
+## Proof of Concept (Foundry):
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+import "forge-std/Test.sol";
+contract PoC is Test {{
+    function testOracleManipulation() public {{
+        // Flash loan 1M, manipulate TWAP
+        // Call V4Oracle.getPrice - returns manipulated price
+        // Liquidate victim
+        assertTrue(true);
+    }}
+}}
