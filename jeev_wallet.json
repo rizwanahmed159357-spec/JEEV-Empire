@@ -8,5 +8,8 @@
   "last_status": "ONLINE - Real Link Mode",
   "last_run": "2026-10-26 09:43:17.414603",
   "last_bounty": "Demo: https://github.com/polar-sh/polar/issues - Yahan $ wale issues hain (Token lagao to real link ayega)",
-  "last_audit": "# Vulnerability Report: LiquidityVaultBridge.sol\n\n## 1. Bug Identification\n\n### Vulnerability Type:\n"
+  "last_audit": "# Vulnerability Report: LiquidityVaultBridge.sol\n\n## 1. Bug Identification\n\n### Vulnerability Type:\n",
+  "real_wallet": "0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40",
+  "real_wallet_note": "Ye real MetaMask hai - Immunefi ka paisa isi pe ayega",
+  "virtual_wallet_note": "Upar wala total_earned / balance fake hai - Bot ke testing ke liye"
 }
