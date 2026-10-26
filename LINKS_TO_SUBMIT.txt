@@ -1,17 +1,33 @@
 
-# 🎯 JEEV - COMPETITION vs BOUNTY DECISION
+# 🔗 JEEV DOUBLE LINK SYSTEM - For Immunefi & All Sites
 
-🤖 DECISION: COMPETITION - Wormhole Competition
-📊 STRATEGY: COMPETITION hai - Duplicate ka dar nahi! Risk: LOW
-⏰ Last Updated: 1 days ago
-💰 Max Bounty: $100000
-🔗 URL: https://immunefi.com/competitions/wormhole
+REAL WALLET (Payout): 0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40
+VIRTUAL FAKE WALLET (Bot Test): $74.0
+STRATEGY: COMPETITION - None - Risk:LOW - Days:1 - $None
 
-📍 SAWAL KA LINK:
+📍 FOR IMMUNEFI (And Every Site Same Logic)
+
+
+❓ QUESTION LINK (Jahan ka sawal/code hai - Ispe click karo):
 https://immunefi.com/competitions/wormhole
+File: contracts/PremiumStaking.sol / Target
 
-📄 MERI REPORT KA LINK:
-https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md
+📄 ANSWER LINK (Jahan JEEV ne jawab likha hai - Yahan se COPY karo):
+https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md
 
-📂 MERA CODE:
-contracts/PremiumStaking.sol
+👉 ACTION:
+1. Question Link dabao -> Immunefi khulega
+2. Answer Link dabao -> GitHub report khulega -> Wahan se report COPY karo
+3. Wapas Question Link pe jao -> Submit Bug pe paste kardo
+
+📍 FOR POLAR.SH
+
+❓ QUESTION: https://github.com/polar-sh/polar/issues
+📄 ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md
+
+📍 FOR SHERLOCK
+
+❓ QUESTION: https://app.sherlock.xyz/audits/contests
+📄 ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md
+
+CODE LOCATION: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/contracts/PremiumStaking.sol

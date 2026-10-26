@@ -1,41 +1,33 @@
 
-# 🔗 MANUAL SUBMIT - CLICK & PASTE - EXCEL LINK JAISA
+# 🔗 JEEV DOUBLE LINK SYSTEM - For Immunefi & All Sites
 
-Tumne bola tha Excel ka link bhejte ho waise hi, ye lo:
+REAL WALLET (Payout): 0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40
+VIRTUAL FAKE WALLET (Bot Test): $74.0
+STRATEGY: COMPETITION - None - Risk:LOW - Days:1 - $None
 
-📍 WEBSITE 1: Polar.sh (Fast $ - 2 din me paisa)
-❓ SAWAL KA LINK (Jahan kaam hai - Ispe click karo):
-https://github.com/polar-sh/polar/issues - $ bounty
-
-📄 MERI REPORT KA LINK (Yahan se copy karo):
-https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md
-
-👉 ACTION: Sawal wale link pe click karo -> GitHub khulega -> Neeche comment me meri report se FIX wala code paste karo -> Submit!
+📍 FOR IMMUNEFI (And Every Site Same Logic)
 
 
-📍 WEBSITE 2: Immunefi (Bada $ - 1 hafte me)
-❓ SAWAL KA LINK:
-https://immunefi.com/bug-bounty - Search: contracts/PremiumStaking.sol
-(Immunefi pe jao, is file ka naam search karo, jo bounty aaye uspe click karo)
+❓ QUESTION LINK (Jahan ka sawal/code hai - Ispe click karo):
+https://immunefi.com/competitions/wormhole
+File: contracts/PremiumStaking.sol / Target
 
-📄 MERI REPORT KA LINK:
-https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md
+📄 ANSWER LINK (Jahan JEEV ne jawab likha hai - Yahan se COPY karo):
+https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md
 
-👉 ACTION: Immunefi wala link kholo -> Submit Bug -> Meri report paste karo!
+👉 ACTION:
+1. Question Link dabao -> Immunefi khulega
+2. Answer Link dabao -> GitHub report khulega -> Wahan se report COPY karo
+3. Wapas Question Link pe jao -> Submit Bug pe paste kardo
 
+📍 FOR POLAR.SH
 
-📍 WEBSITE 3: Sherlock (Contest $500-$5000)
-❓ SAWAL KA LINK:
-https://app.sherlock.xyz/audits
+❓ QUESTION: https://github.com/polar-sh/polar/issues
+📄 ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md
 
-📄 MERI REPORT KA LINK:
-https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md
+📍 FOR SHERLOCK
 
+❓ QUESTION: https://app.sherlock.xyz/audits/contests
+📄 ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md
 
-📂 MERA CODE KAHAN HAI (Location):
-https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/contracts/PremiumStaking.sol
-
-💰 Earning: $1 pending (Real 1 week baad ayega)
-🤖 Bot: 3
-
-Ye file kholo, link pe click karo, jaga khul jayegi, paste kardo!
+CODE LOCATION: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/contracts/PremiumStaking.sol
