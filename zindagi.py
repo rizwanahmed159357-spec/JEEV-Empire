@@ -1,4 +1,4 @@
-# zindagi.py - FINAL FIXED - 8000 chars + Cantina PoC
+# zindagi.py - FINAL HONEST - Real audit - No fake
 import os, glob, json, requests, socket, subprocess
 from datetime import datetime
 
@@ -43,33 +43,33 @@ try:
     from kamana import find_bounties
     bounties, best_target = find_bounties()
     if best_target:
-        STRATEGY = f"{best_target.get('type')} - {best_target.get('title')} - Risk:{best_target.get('risk')} - ${best_target.get('reward')}"
+        STRATEGY = f"{best_target.get('type')} - {best_target.get('title')} - {best_target.get('risk')} - ${best_target.get('reward')}"
         QUESTION_LINK = best_target.get('url','https://cantina.xyz/competitions/revert-v4lend')
         QUESTION_CODE = best_target.get('title','Revert v4lend')
     else:
-        STRATEGY = "COMPETITION - Revert v4lend - Risk:HIGH - $50000"
+        STRATEGY = "COMPETITION - Revert v4lend - TO_CHECK - $50000"
         QUESTION_LINK = "https://cantina.xyz/competitions/revert-v4lend"
         QUESTION_CODE = "Revert v4lend"
 except Exception as e:
-    STRATEGY = f"COMPETITION - Revert v4lend - Risk:HIGH - $50000 - {e}"
+    STRATEGY = f"Revert v4lend - TO_CHECK - {e}"
     QUESTION_LINK = "https://cantina.xyz/competitions/revert-v4lend"
     QUESTION_CODE = "Revert v4lend"
 
-# --- CODE FETCH - FIXED 8000 chars ---
+# --- CODE FETCH - 8000 chars - Real code ---
 target_path = ""
 code_data = ""
 
 try:
     subprocess.run(["rm", "-rf", "/tmp/v4lend"], check=False)
     subprocess.run(["git", "clone", "https://github.com/revert-finance/v4lend.git", "/tmp/v4lend"], check=False)
-    print("✅ Cloned")
+    print("✅ Cloned revert")
 except Exception as e:
     print(f"Clone fail {e}")
 
 for f in glob.glob("/tmp/v4lend/src/oracle/*.sol", recursive=True)[:1]:
     with open(f, "r", encoding="utf-8", errors="ignore") as file:
         target_path = f
-        code_data = file.read()[:8000]  # FIXED 8000 - Pura code!
+        code_data = file.read()[:8000]
         print(f"✅ Oracle {target_path}")
 
 if not code_data:
@@ -79,40 +79,77 @@ if not code_data:
             code_data = file.read()[:8000]
             print(f"✅ Vault {target_path}")
 
+if not code_data:
+    for f in glob.glob("contracts/**/*.sol", recursive=True)[:1]:
+        with open(f, "r", encoding="utf-8", errors="ignore") as file:
+            target_path = f
+            code_data = file.read()[:8000]
+
 if not target_path:
     target_path = QUESTION_CODE
 
-# --- PROMPT FIXED - Cantina format - PoC mandatory! ---
-prompt = f"""You are Cantina senior auditor. Audit file {target_path} with code below. Wallet {REAL_WALLET} is reporter.
+# --- HONEST PROMPT - Fake nahi banayega ---
+prompt = f"""You are a honest Cantina auditor. Audit this Solidity file honestly.
 
+File: {target_path}
 Code:
 {code_data}
 
-Strategy: {STRATEGY}
+Wallet {REAL_WALLET} is reporter, not vulnerable.
 
-TASK: Write 1 HIGH severity finding for Cantina competition revert-v4lend. Do NOT say "please provide full code". Do NOT write generic risks. You MUST give concrete bug.
+Instructions:
+- Read code carefully. Check maxDifference, TWAP window, staleness, reentrancy.
+- If you find REAL bug, give Title, Severity High/Medium, Description, Impact, PoC with forge test.
+- If NO bug found, clearly say "No critical bug found in this file - LOW risk" and explain why code is safe.
+- DO NOT fabricate bug. DO NOT say "please provide full code". Work with given code.
+- English only.
 
-Output MUST be:
+Output format:
+# Finding - [Severity]
+Description, Impact, PoC if bug exists, else No bug found.
+Reporter: {REAL_WALLET}
+"""
 
-# [H-01] Oracle Manipulation via TWAP - maxDifference too high
+content = ""
+for MODEL in ["qwen/qwen3-coder:free", "openrouter/free"]:
+    try:
+        r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {API_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens":6000}, timeout=180)
+        j = r.json()
+        if "choices" in j:
+            content = j["choices"][0]["message"]["content"]
+            break
+    except Exception as e:
+        print(f"Model fail {e}")
+        continue
 
-## Severity: High
-## Vulnerability Details:
-V4Oracle uses Chainlink and Uniswap v3 TWAP. maxDifference is 10%. Attacker flash loans to manipulate TWAP 9%, still passes check, liquidates users at wrong price. TWAP window too short.
+if not content:
+    content = f"# Audit {target_path}\nNo response from AI. Strategy {STRATEGY}\nWallet {REAL_WALLET}\nWill retry next run."
 
-## Impact: Loss of funds - attacker can steal collateral
-## Likelihood: Medium
+MY_REPORT_LINK = f"https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/reports/revert_v4lend_{TIMESTAMP}.md"
 
-## Proof of Concept (Foundry):
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-import "forge-std/Test.sol";
-contract PoC is Test {{
-    function testOracleManipulation() public {{
-        // Flash loan 1M, manipulate TWAP
-        // Call V4Oracle.getPrice - returns manipulated price
-        // Liquidate victim
-        assertTrue(true);
-    }}
-}}
+LINKS_FILE = f"""
+QUESTION: {QUESTION_LINK}
+File: {target_path}
+ANSWER: {MY_REPORT_LINK}
+STRATEGY: {STRATEGY}
+Dated: reports/revert_v4lend_{TIMESTAMP}.md - Real audit, no fake
+"""
+
+with open("JEEV_FINAL_REPORT.md","w",encoding="utf-8") as f: f.write(content)
+with open("JEEV-Empire/JEEV_FINAL_REPORT.md","w",encoding="utf-8") as f: f.write(content)
+
+dated_name = f"reports/revert_v4lend_{TIMESTAMP}.md"
+dated_name2 = f"JEEV-Empire/reports/revert_v4lend_{TIMESTAMP}.md"
+with open(dated_name,"w",encoding="utf-8") as f: f.write(content)
+with open(dated_name2,"w",encoding="utf-8") as f: f.write(content)
+
+with open("LINKS_TO_SUBMIT.txt","w",encoding="utf-8") as f: f.write(LINKS_FILE)
+with open("JEEV-Empire/LINKS_TO_SUBMIT.txt","w",encoding="utf-8") as f: f.write(LINKS_FILE)
+
+wallet["status"] = "ONLINE - Real audit done"
+wallet["last_run"] = str(datetime.now())
+wallet["last_strategy"] = STRATEGY
+save_wallet(wallet)
+
+print(LINKS_FILE)
+print(f"✅ SAVED {dated_name} - Honest report")
