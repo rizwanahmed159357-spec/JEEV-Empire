@@ -1,12 +1,11 @@
 name: JEEV Empire Run
-
 permissions:
   contents: write
-
 on:
   push:
   workflow_dispatch:
-
+  schedule:
+    - cron: '0 22 * * *'  # 3 AM PKT auto
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -39,36 +38,18 @@ jobs:
             exit 1
           fi
 
-      - name: Commit and Push Report
+      - name: Commit and Push Report - DATED - KABHI NAHI UREGA!
         if: always()
         run: |
           git config --global user.name "JEEV AI Bot"
           git config --global user.email "jeev-bot@github.com"
-          if [ -f "JEEV-Empire/JEEV_FINAL_REPORT.md" ]; then
-            cp JEEV-Empire/JEEV_FINAL_REPORT.md ./JEEV_FINAL_REPORT.md || true
-          fi
+          mkdir -p reports
+          mkdir -p JEEV-Empire/reports
+          # Dated files - Har run pe naya naam - Purana nahi urega!
+          # cp reports/*.md to root for email link
+          ls -la reports/ || true
+          ls -la JEEV-Empire/reports/ || true
           ls -la *.md || true
-          ls -la JEEV-Empire/*.md || true
           git add -A
-          git commit -m "🤖 JEEV Report - $(date)" || echo "Nothing to commit"
+          git commit -m "🤖 JEEV Report $(date '+%Y-%m-%d %H:%M') - Never Delete" || echo "Nothing to commit"
           git push || (git pull --rebase && git push) || true
-
-      - name: Send Success Email
-        if: success()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          secure: true
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🚨 JEEV AI (Solidity) - Report Ready!"
-          to: ${{ secrets.EMAIL_USERNAME }}
-          from: JEEV AI Bot <${{ secrets.EMAIL_USERNAME }}>
-          html_body: |
-            <html><body>
-            <h2>🚨 JEEV AI - Solidity Report Ready!</h2>
-            <p><b>Report:</b> <a href="https://github.com/JEEV-Empire/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md">GitHub Report Link</a></p>
-            <p>Model: Solidity Scanner Active</p>
-            <p>File GitHub pe push ho gayi hai!</p>
-            </body></html>
