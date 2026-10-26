@@ -1,4 +1,4 @@
- # kamana.py - FINAL - $None fix
+# kamana.py - FINAL - $None fix
 import requests
 from datetime import datetime
 
@@ -45,7 +45,6 @@ def find_bounties():
     programs = fetch_immunefi_programs()
     best = jeev_decide_kahan_jana_hai(programs)
     bounties = [{"title": p["name"], "reward": p["max_bounty"], "repo": p["name"], "type": p["type"], "url": p["url"], "risk": p["risk"]} for p in programs]
-    # FIX - $None hatane ke liye
     if best:
         best["title"] = best.get("name", "Revert v4lend")
         best["reward"] = best.get("max_bounty", 50000)
