@@ -1,6 +1,6 @@
 
 QUESTION: https://cantina.xyz/competitions/revert-v4lend
 File: /tmp/v4lend/src/oracle/V4Oracle.sol
-ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/reports/revert_v4lend_2026-10-26_21-06-42.md
-STRATEGY: COMPETITION - None - TO_CHECK - $None
-Dated: reports/revert_v4lend_2026-10-26_21-06-42.md
+ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/reports/revert_v4lend_2026-10-26_21-08-07.md
+STRATEGY: COMPETITION - Revert v4lend Competition - TO_CHECK - $50000
+Dated: reports/revert_v4lend_2026-10-26_21-08-07.md
