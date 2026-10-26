@@ -1,12 +1,12 @@
 {
-  "total_earned": 93,
-  "balance": 72,
-  "osaf_earning": 21,
-  "jeev_life_fund": 3,
+  "total_earned": 94.0,
+  "balance": 73.0,
+  "osaf_earning": 21.4,
+  "jeev_life_fund": 3.6,
   "bots": 3,
   "bots_active": 3,
-  "last_status": "ONLINE",
-  "last_run": "2026-10-24T06:01:18.283094",
-  "last_bounty": "BOUNTY-ULTRA-001",
-  "last_audit": "PremiumStaking ERC777 Read-Only Reentrancy"
+  "last_status": "ONLINE - Real Link Mode",
+  "last_run": "2026-10-26 09:41:55.780475",
+  "last_bounty": "Demo: https://github.com/polar-sh/polar/issues - Yahan $ wale issues hain (Token lagao to real link ayega)",
+  "last_audit": "# SECURITY AUDIT REPORT \u2014 LiquidityVaultBridge.sol\n\n**Platform:** Immunefi / Sherlock  \n**Language:*"
 }
