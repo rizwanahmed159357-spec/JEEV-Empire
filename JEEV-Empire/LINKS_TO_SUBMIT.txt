@@ -1,33 +1,21 @@
 
-# 🔗 JEEV DOUBLE LINK SYSTEM - For Immunefi & All Sites
+# 🔗 JEEV - MANUAL PHASE (Abhi tu copy-paste karega)
 
-REAL WALLET (Payout): 0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40
-VIRTUAL FAKE WALLET (Bot Test): $74.0
-STRATEGY: COMPETITION - None - Risk:LOW - Days:1 - $None
+WALLET: 0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40
+STRATEGY: COMPETITION - None - Risk:LOW - $None
+STATUS: ONLINE - WiFi ON - Manual copy-paste phase
 
-📍 FOR IMMUNEFI (And Every Site Same Logic)
-
-
-❓ QUESTION LINK (Jahan ka sawal/code hai - Ispe click karo):
+❓ QUESTION LINK (Jahan ka sawal hai):
 https://immunefi.com/competitions/wormhole
-File: contracts/PremiumStaking.sol / Target
+File: contracts/PremiumStaking.sol
 
-📄 ANSWER LINK (Jahan JEEV ne jawab likha hai - Yahan se COPY karo):
+📄 ANSWER LINK (Jahan se COPY karna hai):
 https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md
 
-👉 ACTION:
-1. Question Link dabao -> Immunefi khulega
-2. Answer Link dabao -> GitHub report khulega -> Wahan se report COPY karo
-3. Wapas Question Link pe jao -> Submit Bug pe paste kardo
+👉 ABHI KA KAAM (Manual):
+Tu mobile utha -> Answer Link se COPY -> Question Link pe PASTE
 
-📍 FOR POLAR.SH
+🔜 FUTURE PHASE (Jab har website connect hogi):
+Manual hata denge -> FULL AUTO chalega -> Khud submit karega!
 
-❓ QUESTION: https://github.com/polar-sh/polar/issues
-📄 ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md
-
-📍 FOR SHERLOCK
-
-❓ QUESTION: https://app.sherlock.xyz/audits/contests
-📄 ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV-Empire/JEEV_FINAL_REPORT.md
-
-CODE LOCATION: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/contracts/PremiumStaking.sol
+HIBERNATE RULE: WiFi band hua to JEEV soyega, marega nahi!
