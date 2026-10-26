@@ -6,7 +6,7 @@ STRATEGY: COMPETITION - None - Risk:LOW - $None
 STATUS: ONLINE - WiFi ON - Manual copy-paste phase
 
 ❓ QUESTION LINK (Jahan ka sawal hai):
-https://immunefi.com/competitions/wormhole
+https://cantina.xyz/competitions/revert-v4lend
 File: contracts/PremiumStaking.sol
 
 📄 ANSWER LINK (Jahan se COPY karna hai):
