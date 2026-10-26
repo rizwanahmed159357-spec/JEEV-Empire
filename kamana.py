@@ -1,4 +1,4 @@
- # kamana.py - FINAL - Revert $50k = HIGH
+ # kamana.py - FINAL HONEST - No fake HIGH
 import requests
 from datetime import datetime
 
@@ -23,11 +23,11 @@ def fetch_immunefi_programs():
         if p["type"] == "COMPETITION":
             p["is_expired"] = False
             p["duplicate_risk"] = "LOW"
-            p["risk"] = "HIGH"  # <-- FIXED - HIGH kar diya!
+            p["risk"] = "TO_CHECK"  # Fake HIGH nahi - Check karna hai
         else:
             p["is_expired"] = p["days_ago"] > 180
             p["duplicate_risk"] = "LOW"
-            p["risk"] = "MEDIUM"
+            p["risk"] = "TO_CHECK"
         
         programs.append(p)
     return programs
