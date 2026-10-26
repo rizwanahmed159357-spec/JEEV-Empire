@@ -1,0 +1,41 @@
+
+# 🔗 MANUAL SUBMIT - CLICK & PASTE - EXCEL LINK JAISA
+
+Tumne bola tha Excel ka link bhejte ho waise hi, ye lo:
+
+📍 WEBSITE 1: Polar.sh (Fast $ - 2 din me paisa)
+❓ SAWAL KA LINK (Jahan kaam hai - Ispe click karo):
+https://github.com/polar-sh/polar/issues - $ bounty
+
+📄 MERI REPORT KA LINK (Yahan se copy karo):
+https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md
+
+👉 ACTION: Sawal wale link pe click karo -> GitHub khulega -> Neeche comment me meri report se FIX wala code paste karo -> Submit!
+
+
+📍 WEBSITE 2: Immunefi (Bada $ - 1 hafte me)
+❓ SAWAL KA LINK:
+https://immunefi.com/bug-bounty - Search: contracts/PremiumStaking.sol
+(Immunefi pe jao, is file ka naam search karo, jo bounty aaye uspe click karo)
+
+📄 MERI REPORT KA LINK:
+https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md
+
+👉 ACTION: Immunefi wala link kholo -> Submit Bug -> Meri report paste karo!
+
+
+📍 WEBSITE 3: Sherlock (Contest $500-$5000)
+❓ SAWAL KA LINK:
+https://app.sherlock.xyz/audits
+
+📄 MERI REPORT KA LINK:
+https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/JEEV_FINAL_REPORT.md
+
+
+📂 MERA CODE KAHAN HAI (Location):
+https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/contracts/PremiumStaking.sol
+
+💰 Earning: $1 pending (Real 1 week baad ayega)
+🤖 Bot: 3
+
+Ye file kholo, link pe click karo, jaga khul jayegi, paste kardo!
