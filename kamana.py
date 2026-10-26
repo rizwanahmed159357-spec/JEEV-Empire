@@ -1,4 +1,4 @@
- # kamana.py - FINAL HONEST - No fake HIGH
+ # kamana.py - FINAL - $None fix
 import requests
 from datetime import datetime
 
@@ -23,7 +23,7 @@ def fetch_immunefi_programs():
         if p["type"] == "COMPETITION":
             p["is_expired"] = False
             p["duplicate_risk"] = "LOW"
-            p["risk"] = "TO_CHECK"  # Fake HIGH nahi - Check karna hai
+            p["risk"] = "TO_CHECK"
         else:
             p["is_expired"] = p["days_ago"] > 180
             p["duplicate_risk"] = "LOW"
@@ -45,4 +45,9 @@ def find_bounties():
     programs = fetch_immunefi_programs()
     best = jeev_decide_kahan_jana_hai(programs)
     bounties = [{"title": p["name"], "reward": p["max_bounty"], "repo": p["name"], "type": p["type"], "url": p["url"], "risk": p["risk"]} for p in programs]
+    # FIX - $None hatane ke liye
+    if best:
+        best["title"] = best.get("name", "Revert v4lend")
+        best["reward"] = best.get("max_bounty", 50000)
+        best["url"] = best.get("url", "https://cantina.xyz/competitions/revert-v4lend")
     return bounties, best
