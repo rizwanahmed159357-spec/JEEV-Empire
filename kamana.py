@@ -3,6 +3,7 @@ import requests
 from datetime import datetime
 
 WALLET = "0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40"
+REAL_WALLET = "0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40"
 
 def fetch_immunefi_programs():
     programs = []
@@ -24,10 +25,13 @@ def fetch_immunefi_programs():
         p["is_expired"] = p["days_ago"] > 90 and p["type"] == "BOUNTY"
         if p["type"] == "COMPETITION":
             p["duplicate_risk"] = "LOW"
+            p["risk"] = "LOW"
         elif p["days_ago"] <= 7:
             p["duplicate_risk"] = "LOW"
+            p["risk"] = "LOW"
         else:
             p["duplicate_risk"] = "HIGH"
+            p["risk"] = "HIGH"
         programs.append(p)
     return programs
 
@@ -43,5 +47,5 @@ def jeev_decide_kahan_jana_hai(programs):
 def find_bounties():
     programs = fetch_immunefi_programs()
     best = jeev_decide_kahan_jana_hai(programs)
-    bounties = [{"title": p["name"], "reward": p["max_bounty"], "repo": p["name"], "type": p["type"], "url": p["url"], "risk": p["duplicate_risk"]} for p in programs]
+    bounties = [{"title": p["name"], "reward": p["max_bounty"], "repo": p["name"], "type": p["type"], "url": p["url"], "risk": p["risk"]} for p in programs]
     return bounties, best
