@@ -1,5 +1,5 @@
-# Defense Review - /tmp/v4lend/src/vault/InterestRateModel.sol
-File: /tmp/v4lend/src/vault/InterestRateModel.sol
+# Defense Review - /tmp/v4lend/src/vault/LiquidationEscrow.sol
+File: /tmp/v4lend/src/vault/LiquidationEscrow.sol
 Strategy: COMPETITION - Revert v4lend Competition - TO_CHECK - $50000
 Wallet: 0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40
 
