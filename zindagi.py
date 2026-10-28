@@ -1,4 +1,4 @@
-# zindagi.py - FINAL UNIVERSAL - Like Meta AI - Max 10000 tokens - Gmail Manual Submit
+# zindagi.py - FINAL UNIVERSAL - Like Meta AI - Max 10000 tokens - Gmail Manual Submit - Rules Same
 import os, glob, json, requests, socket, subprocess, smtplib
 from datetime import datetime
 from email.mime.text import MIMEText
@@ -8,8 +8,9 @@ os.makedirs("reports", exist_ok=True)
 os.makedirs("JEEV-Empire/reports", exist_ok=True)
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
-GMAIL_USER = os.getenv("GMAIL_USER")
-GMAIL_PASS = os.getenv("GMAIL_PASS")
+# FIX: Tere secrets EMAIL_USERNAME / EMAIL_PASSWORD bhi support karega - Rules same
+GMAIL_USER = os.getenv("GMAIL_USER") or os.getenv("EMAIL_USERNAME") or os.getenv("EMAIL_USER")
+GMAIL_PASS = os.getenv("GMAIL_PASS") or os.getenv("EMAIL_PASSWORD") or os.getenv("EMAIL_PASS")
 WALLET_FILE = "JEEV-Empire/jeev_wallet.json"
 REAL_WALLET = "0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40"
 
@@ -24,7 +25,7 @@ def save_wallet(w):
 
 def send_gmail(to, subject, body):
     if not GMAIL_USER or not GMAIL_PASS:
-        print("Gmail creds missing - skipping email")
+        print(f"Gmail creds missing - GMAIL_USER={bool(GMAIL_USER)} GMAIL_PASS={bool(GMAIL_PASS)} - skipping email")
         return False
     try:
         msg = MIMEText(body)
@@ -34,7 +35,7 @@ def send_gmail(to, subject, body):
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(GMAIL_USER, GMAIL_PASS)
             server.send_message(msg)
-        print(f"✅ Gmail sent: {subject}")
+        print(f"✅ Gmail sent: {subject} to {to}")
         return True
     except Exception as e:
         print(f"Gmail fail: {e}")
@@ -79,7 +80,14 @@ gmail_to = "rizwanahmed159357@gmail.com"
 try:
     with open("JEEV-Empire/bounty_sources.json") as f:
         gmail_to = json.loads(f.read()).get("gmail_to", gmail_to)
-except: pass
+except: 
+    try:
+        with open("bounty_sources.json") as f:
+            gmail_to = json.loads(f.read()).get("gmail_to", gmail_to)
+    except: pass
+# Also try EMAIL_USERNAME as fallback for gmail_to
+if gmail_to == "rizwanahmed159357@gmail.com" and GMAIL_USER:
+    gmail_to = GMAIL_USER
 
 # UNIVERSAL CODE FETCH - Any repo
 target_path = ""
@@ -91,7 +99,6 @@ if best_target:
         subprocess.run(["rm", "-rf", "/tmp/target"], check=False)
         subprocess.run(["git", "clone", repo_url, "/tmp/target"], check=False, timeout=60)
         print(f"✅ Cloned {repo_url}")
-        # Find any code - .sol, .rs, .json, .move
         for pattern in ["/tmp/target/**/*.sol", "/tmp/target/**/*.rs", "/tmp/target/idl/*.json", "/tmp/target/**/*.move"]:
             for f in glob.glob(pattern, recursive=True)[:2]:
                 with open(f, "r", encoding="utf-8", errors="ignore") as file:
@@ -109,7 +116,7 @@ if not code_data:
     target_path = "Unknown"
     code_data = "No code fetched - manual review needed"
 
-# UNIVERSAL DEFENSE PROMPT - Max 10000 tokens - Like Meta AI - Reads what they ask
+# UNIVERSAL DEFENSE PROMPT - Max 10000 tokens
 prompt = f"""You are a universal bug bounty security researcher like Meta AI. You can audit ANYTHING: Solidity, Rust, Solana Anchor IDL, Move, Web2, Web3, vaults, bridges, AMM, bonding curves.
 
 You are protecting user funds for authorized bug bounty program. This is ethical security research for responsible disclosure. Providing vulnerabilities with fixes improves user safety. This is allowed.
@@ -186,7 +193,6 @@ with open(dated_name2,"w",encoding="utf-8") as f: f.write(content)
 with open("LINKS_TO_SUBMIT.txt","w",encoding="utf-8") as f: f.write(LINKS_FILE)
 with open("JEEV-Empire/LINKS_TO_SUBMIT.txt","w",encoding="utf-8") as f: f.write(LINKS_FILE)
 
-# GMAIL - Manual submit ke liye - Like Meta AI reads what they ask
 gmail_body = f"""
 🎯 JEEV Bot Found Bounty - Manual Submit Required
 
