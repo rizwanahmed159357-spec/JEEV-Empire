@@ -1,6 +1,8 @@
 
 QUESTION: https://cantina.xyz/competitions/revert-v4lend
-File: /tmp/v4lend/src/vault/LiquidationEscrow.sol
-ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/reports/revert_v4lend_2026-10-28_17-02-32.md
-STRATEGY: COMPETITION - Revert v4lend Competition - TO_CHECK - $50000
-Dated: reports/revert_v4lend_2026-10-28_17-02-32.md - Defense review - No safety filter
+File: /tmp/target/script/DeployV4Utils.s.sol
+ANSWER: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/reports/report_2026-10-28_17-07-37.md
+STRATEGY: COMPETITION - None - $None
+Repo: https://github.com/revert-finance/v4lend.git
+Dated: reports/report_2026-10-28_17-07-37.md
+All Bounties Found: 3
