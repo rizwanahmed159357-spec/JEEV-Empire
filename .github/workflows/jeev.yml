@@ -5,8 +5,8 @@ on:
   push:
   workflow_dispatch:
   schedule:
-    - cron: '0 22 * * *'  # 3 AM PKT
-    - cron: '0 */2 * * *'  # Har 2 ghante
+    - cron: '0 22 * * *'
+    - cron: '0 */2 * * *'
 
 jobs:
   run:
