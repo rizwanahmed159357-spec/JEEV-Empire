@@ -1,4 +1,4 @@
-name: JEEV Empire Run
+ name: JEEV Empire Run
 permissions:
   contents: write
 on:
