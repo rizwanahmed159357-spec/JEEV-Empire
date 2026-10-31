@@ -1,4 +1,4 @@
-# zindagi.py - FINAL UNIVERSAL CANTINA FREE - With Bug Screenshot - Like Meta AI - Max 10000 tokens - Rules Same
+# zindagi.py - FINAL - Zero se start - Gmail Port 587 Fix - Bug Screenshot - Rules Same
 import os, glob, json, requests, socket, subprocess, smtplib, time, re
 from datetime import datetime
 from email.mime.text import MIMEText
@@ -8,14 +8,13 @@ os.makedirs("reports", exist_ok=True)
 os.makedirs("JEEV-Empire/reports", exist_ok=True)
 
 API_KEY = os.getenv("OPENROUTER_API_KEY") or os.getenv("GROQ_API_KEY")
-GMAIL_USER = os.getenv("GMAIL_USER") or os.getenv("EMAIL_USERNAME") or os.getenv("EMAIL_USER")
+GMAIL_USER = os.getenv("GMAIL_USER") or os.getenv("EMAIL_USERNAME") or os.getenv("EMAIL_USER") or "rizwanahmed159357@gmail.com"
 GMAIL_PASS = os.getenv("GMAIL_PASS") or os.getenv("EMAIL_PASSWORD") or os.getenv("EMAIL_PASS")
 WALLET_FILE = "JEEV-Empire/jeev_wallet.json"
 REAL_WALLET = "0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40"
 HISTORY_FILE = "JEEV-Empire/submitted_bounties.json"
 ENTERED_FILE = "JEEV-Empire/entered_bounties.json"
 
-# --- TERE PURANE RULES - SAME ---
 def load_wallet():
     try:
         with open(WALLET_FILE, "r") as f: return json.load(f)
@@ -43,7 +42,6 @@ def add_earning(amount, wallet):
     wallet["balance"] = wallet.get("balance",0) + amount
     return wallet
 
-# --- NEW: BUG KI HI SCREENSHOT LEGA - MOBILE SCREEN KI NAHI ---
 def create_code_screenshot(code_with_lines, filename, bug_keyword="bug"):
     try:
         from PIL import Image, ImageDraw, ImageFont
@@ -57,10 +55,10 @@ def create_code_screenshot(code_with_lines, filename, bug_keyword="bug"):
         except:
             font = ImageFont.load_default()
             font_bold = font
-        draw.text((10, 5), f"JEEV Bot - Vulnerable Code - File Bug: {bug_keyword} - Line with RED is bug", fill=(255, 255, 0), font=font)
+        draw.text((10, 5), f"JEEV Bot - Vulnerable Code - Bug: {bug_keyword} - RED is bug", fill=(255, 255, 0), font=font)
         y = 30
         for line in lines:
-            col = (255, 60, 60) if bug_keyword.lower() in line.lower() or "require" not in line.lower() and ("burn" in line.lower() or "price" in line.lower() or "liquidate" in line.lower()) else (200, 200, 200)
+            col = (255, 60, 60) if bug_keyword.lower() in line.lower() else (200, 200, 200)
             fnt = font_bold if col == (255, 60, 60) else font
             draw.text((10, y), line[:145], fill=col, font=fnt)
             y += 20
@@ -68,55 +66,80 @@ def create_code_screenshot(code_with_lines, filename, bug_keyword="bug"):
         print(f"✅ Bug screenshot saved {filename}")
         return filename
     except Exception as e:
-        print(f"Screenshot fail {e} - Need Pillow: pip install Pillow")
+        print(f"Screenshot fail {e}")
         return None
 
 def send_gmail(to, subject, body):
     if not GMAIL_USER or not GMAIL_PASS:
-        print(f"Gmail creds missing - {bool(GMAIL_USER)} {bool(GMAIL_PASS)}")
+        print(f"Gmail creds missing")
         return False
+    clean_pass = GMAIL_PASS.replace(" ", "").strip()
+    clean_user = GMAIL_USER.strip()
     try:
         msg = MIMEText(body)
         msg['Subject'] = subject
-        msg['From'] = GMAIL_USER
+        msg['From'] = clean_user
         msg['To'] = to
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(GMAIL_USER, GMAIL_PASS)
+        with smtplib.SMTP('smtp.gmail.com', 587, timeout=30) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(clean_user, clean_pass)
             server.send_message(msg)
-        print(f"✅ Gmail sent: {subject}")
+        print(f"✅ Gmail sent via 587: {subject}")
         return True
     except Exception as e:
-        print(f"Gmail fail: {e}")
-        return False
+        print(f"Gmail 587 fail: {e}")
+        try:
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) as server:
+                server.login(clean_user, clean_pass)
+                server.send_message(msg)
+            print(f"✅ Gmail sent via 465")
+            return True
+        except Exception as e2:
+            print(f"Gmail 465 fail: {e2}")
+            return False
 
 def send_gmail_with_screenshot(to, subject, body, screenshot_path):
     if not GMAIL_USER or not GMAIL_PASS:
         print(f"Gmail creds missing")
         return False
-    try:
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.base import MIMEBase
-        from email import encoders
-        msg = MIMEMultipart()
-        msg['Subject'] = subject
-        msg['From'] = GMAIL_USER
-        msg['To'] = to
-        msg.attach(MIMEText(body))
-        if screenshot_path and os.path.exists(screenshot_path):
-            with open(screenshot_path, "rb") as f:
-                part = MIMEBase('application', 'octet-stream')
-                part.set_payload(f.read())
-                encoders.encode_base64(part)
-                part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(screenshot_path)}')
-                msg.attach(part)
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(GMAIL_USER, GMAIL_PASS)
-            server.send_message(msg)
-        print(f"✅ Gmail with BUG screenshot sent: {subject} to {to}")
-        return True
-    except Exception as e:
-        print(f"Gmail with screenshot fail: {e}")
-        return False
+    clean_pass = GMAIL_PASS.replace(" ", "").strip()
+    clean_user = GMAIL_USER.strip()
+    for port, use_tls in [(587, True), (465, False)]:
+        try:
+            from email.mime.multipart import MIMEMultipart
+            from email.mime.base import MIMEBase
+            from email import encoders
+            msg = MIMEMultipart()
+            msg['Subject'] = subject
+            msg['From'] = clean_user
+            msg['To'] = to
+            msg.attach(MIMEText(body))
+            if screenshot_path and os.path.exists(screenshot_path):
+                with open(screenshot_path, "rb") as f:
+                    part = MIMEBase('application', 'octet-stream')
+                    part.set_payload(f.read())
+                    encoders.encode_base64(part)
+                    part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(screenshot_path)}')
+                    msg.attach(part)
+            if use_tls:
+                with smtplib.SMTP('smtp.gmail.com', 587, timeout=30) as server:
+                    server.ehlo()
+                    server.starttls()
+                    server.ehlo()
+                    server.login(clean_user, clean_pass)
+                    server.send_message(msg)
+            else:
+                with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) as server:
+                    server.login(clean_user, clean_pass)
+                    server.send_message(msg)
+            print(f"✅ Gmail with BUG screenshot sent via {port}: {subject} to {to}")
+            return True
+        except Exception as e:
+            print(f"Gmail port {port} fail: {e}")
+            continue
+    return False
 
 def is_wifi_on():
     try:
@@ -125,9 +148,17 @@ def is_wifi_on():
     except: return False
 
 def load_history():
+    # ZERO SE START - Agar file nahi ya empty to naya
     try:
-        with open(HISTORY_FILE) as f: return json.load(f)
-    except: return {"submitted": [], "entered": []}
+        with open(HISTORY_FILE) as f:
+            data = json.load(f)
+            # Agar tune reset karna hai to yahan submitted empty kar de
+            if os.getenv("RESET_HISTORY") == "true":
+                print("RESET_HISTORY true - Zero se start")
+                return {"submitted": [], "entered": []}
+            return data
+    except:
+        return {"submitted": [], "entered": []}
 
 def save_history(h):
     with open(HISTORY_FILE, "w") as f: json.dump(h, f, indent=2)
@@ -151,24 +182,18 @@ def get_cantina_free_bounties():
         except:
             pass
         free.extend(known_free)
-        print(f"Found {len(free)} FREE bounties")
+        print(f"Found {len(free)} FREE bounties - Zero se start")
         return free
     except Exception as e:
         print(f"Cantina fetch fail {e}")
         return known_free
 
-# --- MAIN LOOP ---
 wallet = load_wallet()
 history = load_history()
-
-# TERA GMAIL - YAHAN ADD HAI
 gmail_to = "rizwanahmed159357@gmail.com"
-if GMAIL_USER and "@" in GMAIL_USER:
-    # Agar GMAIL_USER hi tera email hai to wahi use hoga, nahi to ye wala
-    gmail_to = "rizwanahmed159357@gmail.com"
 
 if not is_wifi_on():
-    wallet["status"] = "HIBERNATE - WiFi OFF - Soya hua hai, WiFi on hote hi chalega"
+    wallet["status"] = "HIBERNATE - WiFi OFF"
     save_wallet(wallet)
     print("WiFi OFF - Sleeping")
     exit(0)
@@ -188,8 +213,8 @@ for bounty in all_free:
     to_audit.append(bounty)
 
 if not to_audit:
-    print("Koi naya FREE bounty nahi")
-    wallet["status"] = "ONLINE - No new FREE bounty - Waiting"
+    print("Koi naya FREE bounty nahi - Reset karna hai to RESET_HISTORY=true env set karo ya submitted_bounties.json delete karo")
+    wallet["status"] = "ONLINE - No new FREE bounty - Waiting - Zero se start ke liye file delete karo"
     save_wallet(wallet)
     exit(0)
 
@@ -275,7 +300,6 @@ Researcher: {REAL_WALLET}
     with open("JEEV_FINAL_REPORT.md","w",encoding="utf-8") as f: f.write(content)
     with open("JEEV-Empire/JEEV_FINAL_REPORT.md","w",encoding="utf-8") as f: f.write(content)
 
-    # BUG KI HI SCREENSHOT - MOBILE SCREEN KI NAHI
     bug_keyword = os.path.basename(target_path).replace(".sol","")
     screenshot_path = f"reports/bug_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}.png"
     screenshot_path2 = f"JEEV-Empire/reports/bug_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}.png"
@@ -283,7 +307,7 @@ Researcher: {REAL_WALLET}
     create_code_screenshot(full_source_with_lines, screenshot_path2, bug_keyword=bug_keyword)
 
     gmail_body = f"""
-🎯 JEEV Bot - FREE Cantina Bounty - Manual Submit Required - BUG SCREENSHOT ATTACHED
+🎯 JEEV Bot - FREE Cantina Bounty - Zero se Start - BUG SCREENSHOT ATTACHED
 
 Platform: {best_target.get('platform','CANTINA')}
 Title: {STRATEGY}
@@ -293,43 +317,28 @@ File: {target_path}
 Repo: {repo_url} @ {commit}
 Gmail To: {gmail_to}
 
-STATUS: Ye bounty FREE hai - No deposit - Tu ispe pehle enter nahi kiya ya finding nahi bheji
-
-Bug Report (Max 10000 tokens):
+Bug Report:
 {content[:8000]}
 
 ---
-FULL SOURCE CODE WHERE BUG IS (with line numbers):
+FULL SOURCE WITH LINES:
 {full_source_with_lines[:10000]}
 
 ---
-SCREENSHOT: Bug ki hi screenshot attach hai - Mobile screen ki nahi - Sirf code ki jahan bug hai - RED line bug hai
-File: {screenshot_path}
-
-Steps to submit (jaise tu karta hai):
-1. Open: {QUESTION_LINK}
-2. Join bounty (FREE)
-3. Target: {target_path}
-4. Risk (512 chars): Copy from report
-5. Finding Description: Copy full report + Full source block
-6. Screenshot: Jo attachment me hai {os.path.basename(screenshot_path)} wahi upload kar de - Ya GitHub se {screenshot_path} download karke upload
-7. Submit
-
+SCREENSHOT: Bug ki hi - RED line bug hai - File: {screenshot_path}
+Steps: Open {QUESTION_LINK} -> Join (FREE) -> Target {target_path} -> Risk copy -> Description copy + source block -> Screenshot upload {os.path.basename(screenshot_path)} -> Submit
 History: Submitted={len(history.get('submitted',[]))} Entered={len(history.get('entered',[]))}
 Wallet: {REAL_WALLET}
-Report: https://github.com/rizwanahmed159357-spec/JEEV-Empire/blob/main/reports/{os.path.basename(dated_name)}
 Rules same: Monthly $5 Osaf ko, Hissa 70/30 before $5, 40/60 after
 """
-
-    # Gmail with bug screenshot - rizwanahmed159357@gmail.com pe jayega
-    send_gmail_with_screenshot(gmail_to, f"🎯 FREE Cantina: {STRATEGY} - BUG Screenshot - {target_path}", gmail_body, screenshot_path)
+    send_gmail_with_screenshot(gmail_to, f"🎯 FREE Cantina: {STRATEGY} - BUG Screenshot - Zero Start", gmail_body, screenshot_path)
 
     if QUESTION_LINK not in history.get("entered",[]):
         history["entered"].append(QUESTION_LINK)
     save_history(history)
 
     wallet = add_earning(10, wallet)
-    wallet["status"] = f"ONLINE - Found {STRATEGY} - Gmail sent to {gmail_to} with bug screenshot"
+    wallet["status"] = f"ONLINE - Found {STRATEGY} - Gmail sent to {gmail_to} with bug screenshot - Zero start"
     wallet["last_run"] = str(datetime.now())
     wallet["last_strategy"] = STRATEGY
     save_wallet(wallet)
@@ -338,15 +347,15 @@ Rules same: Monthly $5 Osaf ko, Hissa 70/30 before $5, 40/60 after
     time.sleep(5)
 
 if os.getenv("GITHUB_ACTIONS") != "true":
-    print("Local mode - Har 1 ghante me check karega - WiFi band to soyega")
+    print("Local mode - Har 1 ghante check - WiFi band to soyega")
     while True:
         time.sleep(3600)
         if not is_wifi_on():
-            wallet["status"] = "HIBERNATE - WiFi OFF - Soya hua"
+            wallet["status"] = "HIBERNATE - WiFi OFF"
             save_wallet(wallet)
             print("WiFi OFF - Sleeping 10 min")
             time.sleep(600)
             continue
         break
 
-print("✅ JEEV Zindagi FINAL done - FREE Cantina bounties audited - Gmail with BUG screenshot sent to rizwanahmed159357@gmail.com")
+print("✅ JEEV Zindagi FINAL done - Zero se start - Gmail with BUG screenshot sent to rizwanahmed159357@gmail.com")
