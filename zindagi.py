@@ -1,4 +1,4 @@
-# zindagi.py - FINAL V5.5 - ONLY OPENROUTER FREE MODELS - GROQ FREE REMOVED - NOV 2026 VALID
+# zindagi.py - FINAL V5.6 - NOV 2026 VALID FREE MODELS ONLY - GROQ FREE GONE - OPENROUTER NEW FREE
 import os, glob, json, requests, socket, subprocess, smtplib, time, re
 from datetime import datetime
 from email.mime.text import MIMEText
@@ -82,7 +82,7 @@ def create_code_screenshot(code_with_lines, filename, vulnerable_lines):
         except:
             font = ImageFont.load_default()
             font_bold = font
-        draw.text((10, 5), f"JEEV Bot V5.5 - RED = Bug Line {vulnerable_lines}", fill=(255,255,0), font=font)
+        draw.text((10, 5), f"JEEV Bot V5.6 - RED = Bug Line {vulnerable_lines}", fill=(255,255,0), font=font)
         y=30
         for idx, line in enumerate(cut):
             real_no = offset+idx+1
@@ -215,11 +215,13 @@ for best_target in to_audit[:2]:
         content=""
         OR_KEY = os.getenv("OPENROUTER_API_KEY")
         FREE_MODELS = [
-            "google/gemma-2-9b-it:free",
-            "openai/gpt-4o-mini:free",
-            "meta-llama/llama-3.1-8b-instruct:free",
-            "qwen/qwen-2.5-7b-instruct:free",
-            "google/gemma-3-4b-it:free"
+            "openrouter/free",
+            "google/gemma-4-31b-it:free",
+            "google/gemma-4-26b-a4b-it:free",
+            "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "nvidia/nemotron-3.5-lightning:free",
+            "thinkingmachines/inkling-small:free",
+            "cohere/north-mini-code:free"
         ]
         for MODEL in FREE_MODELS:
             try:
@@ -228,10 +230,11 @@ for best_target in to_audit[:2]:
                 j=r.json()
                 if "choices" in j and j["choices"]:
                     c=j["choices"][0]["message"]["content"]
+                    print(f"OR {MODEL} len {len(c)}")
                     if len(c)>300 and "Missing check" not in c and "manual review" not in c.lower():
                         content=c; print(f"✅ OR {MODEL} success REAL BUG Length {len(c)}"); break
                 else:
-                    print(f"OR {MODEL} no choices {str(j)[:400]}")
+                    print(f"OR {MODEL} no choices {str(j)[:500]}")
             except Exception as e: print(f"OR {MODEL} fail {e}"); continue
 
         if not content or len(content)<300:
@@ -245,9 +248,9 @@ for best_target in to_audit[:2]:
         screenshot_path = f"reports/bug_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}_{safe_name}.png"
         create_code_screenshot(full_source_with_lines, screenshot_path, vulnerable_lines)
 
-        gmail_body = f"JEEV Bot V5.5 - REAL BUG ONLY - RED {vulnerable_lines} - 6 min gap - File ID {file_id} Title: {STRATEGY} URL: {QUESTION_LINK} File: {target_path} Reward: {best_target.get('reward')} RED Lines: {vulnerable_lines} Bug Report: {content[:6500]} FULL SOURCE: {full_source_with_lines[:8000]} Wallet: {REAL_WALLET} Rules same: Monthly $5, 70/30 before $5, 40/60 after"
+        gmail_body = f"JEEV Bot V5.6 - REAL BUG ONLY - RED {vulnerable_lines} - 6 min gap - File ID {file_id} Title: {STRATEGY} URL: {QUESTION_LINK} File: {target_path} Reward: {best_target.get('reward')} RED Lines: {vulnerable_lines} Bug Report: {content[:6500]} FULL SOURCE: {full_source_with_lines[:8000]} Wallet: {REAL_WALLET}"
 
-        send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - RED {vulnerable_lines} - REAL BUG - V5.5", gmail_body, screenshot_path)
+        send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - RED {vulnerable_lines} - REAL BUG - V5.6", gmail_body, screenshot_path)
         
         if file_id not in history.get("entered", []):
             history["entered"].append(file_id)
@@ -261,4 +264,4 @@ for best_target in to_audit[:2]:
         print(f"✅ Done REAL BUG {STRATEGY} - RED {vulnerable_lines} - Sleeping 6 min")
         time.sleep(360)
 
-print("✅ JEEV Zindagi FINAL V5.5 done - ONLY OPENROUTER FREE MODELS - Groq Llama removed (enterprise only now)")
+print("✅ JEEV Zindagi FINAL V5.6 done - NOV 2026 VALID FREE MODELS ONLY")
