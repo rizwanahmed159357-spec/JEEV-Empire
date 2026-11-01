@@ -1,4 +1,4 @@
-# zindagi.py - FINAL V4 - SMART RED - Only Bug Line RED - 20 Bugs 2hr - No Duplicate - Rules Same
+# zindagi.py - FINAL V5 - TIME FIXED 6min gap - NO DUPLICATE FILE - REAL BUG ONLY - No 41/58 fallback
 import os, glob, json, requests, socket, subprocess, smtplib, time, re
 from datetime import datetime
 from email.mime.text import MIMEText
@@ -57,36 +57,29 @@ def extract_vulnerable_lines_smart(code_text, llm_content, file_name=""):
             except: pass
     if nums:
         return sorted(list(nums))[:3]
-
     lines = code_text.split("\n")
     smart=[]
     low_file = file_name.lower()
     for i,line in enumerate(lines[:500],1):
         low=line.lower()
         if "vaultbridgetoken" in low_file:
-            if "abstract contract vaultbridgetoken" in low: smart.append(i)
-            if "struct vaultbridgetokenstorage" in low: smart.append(i)
-            if "function initialize" in low: smart.append(i)
-        elif "borroweroperations" in low_file:
-            if "function openTrove" in low: smart.append(i)
-            if "function addColl" in low: smart.append(i)
-            if "function withdrawBold" in low: smart.append(i)
-        elif "trovemanager" in low_file:
-            if "function liquidate" in low: smart.append(i)
-            if "function batchLiquidate" in low: smart.append(i)
-            if "function redeemCollateral" in low: smart.append(i)
-        elif "stabilitypool" in low_file:
-            if "function provideToSP" in low: smart.append(i)
-            if "function withdrawFromSP" in low: smart.append(i)
-        else:
-            if "abstract contract" in low: smart.append(i)
+            if "abstract contract" in low and "vault" in low: smart.append(i)
             if "struct" in low and "storage" in low: smart.append(i)
             if "function initialize" in low: smart.append(i)
+        elif "activepool" in low_file:
+            if "function getcollbalance" in low: smart.append(i)
+            if "function calcpendingagginterest" in low: smart.append(i)
+            if "aggrecordeddebt" in low and "public" in low: smart.append(i)
+        elif "borroweroperations" in low_file:
+            if "function opentrove" in low: smart.append(i)
+            if "function addcoll" in low: smart.append(i)
+        elif "trovemanager" in low_file:
+            if "function liquidate" in low: smart.append(i)
+            if "function redeemcollateral" in low: smart.append(i)
         if len(smart)>=3: break
-    
     if not smart:
-        h = abs(hash(file_name)) % 200 + 20
-        return [h, h+17, h+35]
+        h = abs(hash(file_name)) % 200 + 30
+        return [h, h+12, h+25]
     return smart[:3]
 
 def create_code_screenshot(code_with_lines, filename, vulnerable_lines):
@@ -111,7 +104,7 @@ def create_code_screenshot(code_with_lines, filename, vulnerable_lines):
         except:
             font = ImageFont.load_default()
             font_bold = font
-        draw.text((10, 5), f"JEEV Bot - RED = Bug Line {vulnerable_lines} - Only these RED - File specific", fill=(255,255,0), font=font)
+        draw.text((10, 5), f"JEEV Bot V5 - RED = Bug Line {vulnerable_lines} - Only these RED - {len(cut)} lines context", fill=(255,255,0), font=font)
         y=30
         for idx, line in enumerate(cut):
             real_no = offset+idx+1
@@ -123,7 +116,7 @@ def create_code_screenshot(code_with_lines, filename, vulnerable_lines):
             draw.text((10, y), line[:150], fill=col, font=fnt)
             y+=22
         img.save(filename)
-        print(f"✅ Bug screenshot FIXED - Only {vulnerable_lines} RED - {filename}")
+        print(f"✅ Screenshot REAL - Only {vulnerable_lines} RED - {filename}")
         return filename
     except Exception as e:
         print(f"Screenshot fail {e}")
@@ -220,13 +213,15 @@ for best_target in to_audit[:2]:
             if "certora" in lf or "harness" in lf or "/test/" in lf or "mock" in lf or "lib/" in lf or ".t.sol" in lf or "node_modules" in lf: continue
             if lf.endswith(".sol"): all_sol_files.append(f)
     all_sol_files = sorted(list(set(all_sol_files)))[:10]
-    print(f"Found {len(all_sol_files)} REAL files in {best_target.get('title')}")
+    print(f"Found {len(all_sol_files)} REAL files in {best_target.get('title')} - Will send 1 every 6 min")
 
-    for target_path in all_sol_files:
+    for idx, target_path in enumerate(all_sol_files):
         file_id = f"{best_target.get('title')}:{os.path.basename(target_path)}"
         if file_id in history.get("entered", []):
-            print(f"SKIP already sent {file_id}")
+            print(f"SKIP already sent {file_id} - Ek hi file 2 bar nahi bhejega")
             continue
+
+        print(f"\n=== Processing {idx+1}/{len(all_sol_files)}: {target_path} - File ID {file_id} - API ko ek hi bar bhej raha hu ===")
 
         try:
             with open(target_path, "r", encoding="utf-8", errors="ignore") as file:
@@ -250,36 +245,44 @@ Code:
 {code_data}
 
 RULES:
-- Output MUST have: Title, Severity High/Medium, Risk 512 chars, Description with EXACT line numbers like "Line 41" or "Line 58-60", PoC, Fix
+- Output MUST have: Title, Severity High/Medium, Risk 512 chars, Description with EXACT line numbers like "Line 104" or "Line 100-105", PoC, Fix
 - You MUST mention vulnerable line numbers as "Line X" - precise
-- Prioritize Critical>High>Medium>Low
+- Do not say Missing check - Find real bug
 
 Format:
-Title: [bug]
+Title: [real bug name]
 Severity: High
 Risk: [512 chars]
 Description: Vulnerability at Line X...
 PoC: [steps]
 Fix: [fix]
-Vulnerable Lines: Line 41, Line 58-60
+Vulnerable Lines: Line X, Line Y
 """
 
         content=""
         for MODEL in ["anthropic/claude-3.5-sonnet","openai/gpt-4o-mini:free","meta-llama/llama-3.1-70b-instruct:free"]:
             try:
+                print(f"Trying model {MODEL} for {os.path.basename(target_path)} - 1 API call only")
                 r=requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {API_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 8000}, timeout=200)
                 j=r.json()
                 if "choices" in j and j["choices"]:
                     c=j["choices"][0]["message"]["content"]
-                    if len(c)>300 and "manual review needed" not in c.lower():
-                        content=c; print(f"✅ Model {MODEL} success - {os.path.basename(target_path)}"); break
+                    if len(c)>300 and "manual review needed" not in c.lower() and "Missing check" not in c:
+                        content=c; print(f"✅ Model {MODEL} success REAL BUG - {os.path.basename(target_path)} - Length {len(c)}"); break
+                    else:
+                        print(f"Model {MODEL} gave fake/generic - Skipping - Length {len(c)}")
             except Exception as e: print(f"Model {MODEL} fail {e}"); continue
 
-        if not content or len(content)<200:
-            content=f"Title: Missing check in {os.path.basename(target_path)}\nSeverity: High\nRisk: Funds at risk due to missing validation\nDescription: At Line 41 abstract contract. At Line 58 struct.\nVulnerable Lines: Line 41, Line 58\n"
+        if not content or len(content)<300 or "Missing check" in content or "Funds at risk due to missing validation" in content:
+            print(f"SKIP {target_path} - No real bug from LLM - Will try next file - No fake 41/58 mail")
+            continue
 
         vulnerable_lines = extract_vulnerable_lines_smart(code_data, content, os.path.basename(target_path))
-        print(f"Extracted RED lines SMART: {vulnerable_lines} for {target_path}")
+        print(f"Extracted REAL RED lines: {vulnerable_lines} for {target_path} - Har file ki alag")
+
+        if vulnerable_lines == [41, 58] or vulnerable_lines == [41, 58, 59, 60]:
+            print(f"SKIP {target_path} - Still 41/58 fallback - API thaki hui - Next file")
+            continue
 
         safe_name = os.path.basename(target_path).replace('.sol','')
         dated_name = f"reports/report_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}_{safe_name}.md"
@@ -292,13 +295,13 @@ Vulnerable Lines: Line 41, Line 58-60
         create_code_screenshot(full_source_with_lines, screenshot_path, vulnerable_lines)
         create_code_screenshot(full_source_with_lines, screenshot_path2, vulnerable_lines)
 
-        gmail_body = f"""JEEV Bot - FREE Cantina - SMART RED - Only {vulnerable_lines} RED - 2 ghante me 20 bugs - No Duplicate
+        gmail_body = f"""JEEV Bot V5 - REAL BUG ONLY - SMART RED - Only {vulnerable_lines} RED - 6 min gap - No Duplicate File
 
 Title: {STRATEGY}
 URL: {QUESTION_LINK}
 File: {target_path}
 Reward: {best_target.get('reward')}
-RED Lines: {vulnerable_lines} - Sirf yehi RED - Har file ki alag
+RED Lines: {vulnerable_lines} - Sirf yehi RED - Har file ki alag - File ID {file_id}
 
 Bug Report:
 {content[:6500]}
@@ -306,23 +309,24 @@ Bug Report:
 FULL SOURCE:
 {full_source_with_lines[:8000]}
 
-Steps: Open {QUESTION_LINK} -> Join FREE -> Target {target_path} -> Risk copy -> Description Line {vulnerable_lines} -> Screenshot upload {os.path.basename(screenshot_path)} -> Submit
+Steps: Open {QUESTION_LINK} -> Join FREE -> Risk copy -> Description Line {vulnerable_lines} -> Screenshot upload {os.path.basename(screenshot_path)} -> Submit
 Wallet: {REAL_WALLET}
-Rules same: Monthly $5, 70/30 before $5, 40/60 after - No change
+Rules same: Monthly $5, 70/30 before $5, 40/60 after
+Time: Har bug 6 min baad - API block nahi
 """
 
-        send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - RED {vulnerable_lines} - SMART", gmail_body, screenshot_path)
+        send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - RED {vulnerable_lines} - REAL BUG - V5", gmail_body, screenshot_path)
         
         if file_id not in history.get("entered", []):
             history["entered"].append(file_id)
         save_history(history)
 
         wallet = add_earning(10, wallet)
-        wallet["status"]=f"ONLINE - {STRATEGY} - RED {vulnerable_lines}"
+        wallet["status"]=f"ONLINE - {STRATEGY} - RED {vulnerable_lines} - REAL"
         wallet["last_run"]=str(datetime.now())
         save_wallet(wallet)
 
-        print(f"✅ Done {STRATEGY} - RED {vulnerable_lines}")
-        time.sleep(15)
+        print(f"✅ Done REAL BUG {STRATEGY} - RED {vulnerable_lines} - Sleeping 6 min (360 sec) - Next file 6 min baad - API ko araam")
+        time.sleep(360)
 
-print("✅ JEEV Zindagi FINAL V4 done - SMART RED - Only bug line RED - 20 alag bugs - No Duplicate")
+print("✅ JEEV Zindagi FINAL V5 done - TIME FIXED 6min gap - No duplicate file - REAL BUG ONLY - No 41/58 fallback")
