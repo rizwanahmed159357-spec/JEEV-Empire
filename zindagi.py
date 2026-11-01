@@ -7,6 +7,33 @@ TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 os.makedirs("reports", exist_ok=True)
 os.makedirs("JEEV-Empire/reports", exist_ok=True)
 
+# AUTO-CLEAN - Mobile pe delete nahi hota to bot khud delete karega
+try:
+    print("🧹 Auto-cleaning old reports - Mobile delete fix")
+    for folder in ["reports", "JEEV-Empire/reports"]:
+        if os.path.exists(folder):
+            for f in glob.glob(f"{folder}/bug_*.png") + glob.glob(f"{folder}/report_*.md"):
+                try:
+                    pass
+                except: pass
+    if os.path.exists("JEEV-Empire/submitted_bounties.json"):
+        with open("JEEV-Empire/submitted_bounties.json","r") as f:
+            data=json.load(f)
+            entered = data.get("entered", [])
+            if len(entered) >= 8:
+                print(f"🧹 History full {len(entered)} files - Resetting for fresh V5 real bugs - Old 41/58 fake bugs hatao")
+                with open("JEEV-Empire/submitted_bounties.json","w") as out:
+                    json.dump({"submitted": [], "entered": []}, out, indent=2)
+                with open("JEEV-Empire/entered_bounties.json","w") as out:
+                    json.dump({"submitted": [], "entered": []}, out, indent=2)
+                for folder in ["reports", "JEEV-Empire/reports"]:
+                    for pat in [f"{folder}/bug_*.png", f"{folder}/report_*.md"]:
+                        for fp in glob.glob(pat):
+                            try: os.remove(fp); print(f"Deleted {fp}")
+                            except: pass
+except Exception as e:
+    print(f"Auto-clean skip {e}")
+
 API_KEY = os.getenv("OPENROUTER_API_KEY") or os.getenv("GROQ_API_KEY")
 GMAIL_USER = os.getenv("GMAIL_USER") or os.getenv("EMAIL_USERNAME") or os.getenv("EMAIL_USER") or "rizwanahmed159357@gmail.com"
 GMAIL_PASS = os.getenv("GMAIL_PASS") or os.getenv("EMAIL_PASSWORD") or os.getenv("EMAIL_PASS")
@@ -260,18 +287,36 @@ Vulnerable Lines: Line X, Line Y
 """
 
         content=""
-        for MODEL in ["anthropic/claude-3.5-sonnet","openai/gpt-4o-mini:free","meta-llama/llama-3.1-70b-instruct:free"]:
-            try:
-                print(f"Trying model {MODEL} for {os.path.basename(target_path)} - 1 API call only")
-                r=requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {API_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 8000}, timeout=200)
-                j=r.json()
-                if "choices" in j and j["choices"]:
-                    c=j["choices"][0]["message"]["content"]
-                    if len(c)>300 and "manual review needed" not in c.lower() and "Missing check" not in c:
-                        content=c; print(f"✅ Model {MODEL} success REAL BUG - {os.path.basename(target_path)} - Length {len(c)}"); break
+        GROQ_KEY = os.getenv("GROQ_API_KEY")
+        OR_KEY = os.getenv("OPENROUTER_API_KEY")
+        if GROQ_KEY:
+            for MODEL in ["llama-3.1-70b-versatile", "mixtral-8x7b-32768", "llama3-70b-8192"]:
+                try:
+                    print(f"Trying GROQ model {MODEL} for {os.path.basename(target_path)} - 1 API call only")
+                    r=requests.post("https://api.groq.com/openai/v1/chat/completions", headers={"Authorization": f"Bearer {GROQ_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 6000}, timeout=120)
+                    j=r.json()
+                    if "choices" in j and j["choices"]:
+                        c=j["choices"][0]["message"]["content"]
+                        if len(c)>300 and "manual review needed" not in c.lower() and "Missing check" not in c:
+                            content=c; print(f"✅ GROQ {MODEL} success REAL BUG - {os.path.basename(target_path)} - Length {len(c)}"); break
+                        else:
+                            print(f"GROQ {MODEL} fake - Skipping Length {len(c) if 'c' in locals() else 0}")
                     else:
-                        print(f"Model {MODEL} gave fake/generic - Skipping - Length {len(c)}")
-            except Exception as e: print(f"Model {MODEL} fail {e}"); continue
+                        print(f"GROQ {MODEL} no choices {str(j)[:300]}")
+                except Exception as e: print(f"GROQ {MODEL} fail {e}"); continue
+        if not content and OR_KEY:
+            for MODEL in ["openai/gpt-4o-mini:free","meta-llama/llama-3.1-70b-instruct:free","google/gemma-2-9b-it:free"]:
+                try:
+                    print(f"Trying OR model {MODEL} for {os.path.basename(target_path)} - 1 API call only")
+                    r=requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {OR_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 6000}, timeout=180)
+                    j=r.json()
+                    if "choices" in j and j["choices"]:
+                        c=j["choices"][0]["message"]["content"]
+                        if len(c)>300 and "manual review needed" not in c.lower() and "Missing check" not in c:
+                            content=c; print(f"✅ OR {MODEL} success REAL BUG - {os.path.basename(target_path)} - Length {len(c)}"); break
+                        else:
+                            print(f"OR {MODEL} fake Length {len(c) if 'c' in locals() else 0}")
+                except Exception as e: print(f"OR {MODEL} fail {e}"); continue
 
         if not content or len(content)<300 or "Missing check" in content or "Funds at risk due to missing validation" in content:
             print(f"SKIP {target_path} - No real bug from LLM - Will try next file - No fake 41/58 mail")
