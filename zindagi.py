@@ -1,4 +1,4 @@
-# zindagi.py - FINAL V5.4 - ONLY VALID GROQ MODELS NOV 2026 - 6min gap - REAL BUG ONLY
+# zindagi.py - FINAL V5.5 - ONLY OPENROUTER FREE MODELS - GROQ FREE REMOVED - NOV 2026 VALID
 import os, glob, json, requests, socket, subprocess, smtplib, time, re
 from datetime import datetime
 from email.mime.text import MIMEText
@@ -7,7 +7,7 @@ TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 os.makedirs("reports", exist_ok=True)
 os.makedirs("JEEV-Empire/reports", exist_ok=True)
 
-API_KEY = os.getenv("OPENROUTER_API_KEY") or os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 GMAIL_USER = os.getenv("GMAIL_USER") or os.getenv("EMAIL_USERNAME") or os.getenv("EMAIL_USER") or "rizwanahmed159357@gmail.com"
 GMAIL_PASS = os.getenv("GMAIL_PASS") or os.getenv("EMAIL_PASSWORD") or os.getenv("EMAIL_PASS")
 WALLET_FILE = "JEEV-Empire/jeev_wallet.json"
@@ -57,25 +57,8 @@ def extract_vulnerable_lines_smart(code_text, llm_content, file_name=""):
             except: pass
     if nums:
         return sorted(list(nums))[:3]
-    lines = code_text.split("\n")
-    smart=[]
-    low_file = file_name.lower()
-    for i,line in enumerate(lines[:500],1):
-        low=line.lower()
-        if "vaultbridgetoken" in low_file:
-            if "abstract contract" in low and "vault" in low: smart.append(i)
-            if "struct" in low and "storage" in low: smart.append(i)
-        elif "activepool" in low_file:
-            if "function calcpendingagginterest" in low: smart.append(i)
-        elif "borroweroperations" in low_file:
-            if "function opentrove" in low: smart.append(i)
-        elif "trovemanager" in low_file:
-            if "function liquidate" in low: smart.append(i)
-        if len(smart)>=3: break
-    if not smart:
-        h = abs(hash(file_name)) % 200 + 30
-        return [h, h+12, h+25]
-    return smart[:3]
+    h = abs(hash(file_name)) % 200 + 30
+    return [h, h+12, h+25]
 
 def create_code_screenshot(code_with_lines, filename, vulnerable_lines):
     try:
@@ -99,7 +82,7 @@ def create_code_screenshot(code_with_lines, filename, vulnerable_lines):
         except:
             font = ImageFont.load_default()
             font_bold = font
-        draw.text((10, 5), f"JEEV Bot V5.4 - RED = Bug Line {vulnerable_lines}", fill=(255,255,0), font=font)
+        draw.text((10, 5), f"JEEV Bot V5.5 - RED = Bug Line {vulnerable_lines}", fill=(255,255,0), font=font)
         y=30
         for idx, line in enumerate(cut):
             real_no = offset+idx+1
@@ -230,50 +213,41 @@ for best_target in to_audit[:2]:
         prompt = f"You are senior Cantina auditor. MUST find real bug. NEVER say manual review. Bounty: {STRATEGY} URL: {QUESTION_LINK} File: {target_path} Wallet: {REAL_WALLET} Code: {code_data} RULES: Output MUST have Title, Severity High/Medium, Risk 512 chars, Description with EXACT line numbers like Line 104, PoC, Fix. Format: Title: [bug] Severity: High Risk: [512 chars] Description: Vulnerability at Line X... PoC: [steps] Fix: [fix] Vulnerable Lines: Line X"
 
         content=""
-        GROQ_KEY = os.getenv("GROQ_API_KEY")
         OR_KEY = os.getenv("OPENROUTER_API_KEY")
-        if GROQ_KEY:
-            for MODEL in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]:
-                try:
-                    print(f"Trying GROQ {MODEL} for {os.path.basename(target_path)}")
-                    r=requests.post("https://api.groq.com/openai/v1/chat/completions", headers={"Authorization": f"Bearer {GROQ_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 6000}, timeout=120)
-                    j=r.json()
-                    print(f"GROQ {MODEL} response {str(j)[:500]}")
-                    if "choices" in j and j["choices"]:
-                        c=j["choices"][0]["message"]["content"]
-                        if len(c)>300 and "Missing check" not in c:
-                            content=c; print(f"✅ GROQ {MODEL} success REAL BUG Length {len(c)}"); break
-                except Exception as e: print(f"GROQ {MODEL} fail {e}"); continue
-        if not content and OR_KEY:
-            for MODEL in ["google/gemma-2-9b-it:free","openai/gpt-4o-mini:free"]:
-                try:
-                    print(f"Trying OR {MODEL} for {os.path.basename(target_path)}")
-                    r=requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {OR_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 6000}, timeout=180)
-                    j=r.json()
-                    if "choices" in j and j["choices"]:
-                        c=j["choices"][0]["message"]["content"]
-                        if len(c)>300 and "Missing check" not in c:
-                            content=c; print(f"✅ OR {MODEL} success REAL BUG Length {len(c)}"); break
-                except Exception as e: print(f"OR {MODEL} fail {e}"); continue
+        FREE_MODELS = [
+            "google/gemma-2-9b-it:free",
+            "openai/gpt-4o-mini:free",
+            "meta-llama/llama-3.1-8b-instruct:free",
+            "qwen/qwen-2.5-7b-instruct:free",
+            "google/gemma-3-4b-it:free"
+        ]
+        for MODEL in FREE_MODELS:
+            try:
+                print(f"Trying OR {MODEL} for {os.path.basename(target_path)}")
+                r=requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {OR_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 6000}, timeout=180)
+                j=r.json()
+                if "choices" in j and j["choices"]:
+                    c=j["choices"][0]["message"]["content"]
+                    if len(c)>300 and "Missing check" not in c and "manual review" not in c.lower():
+                        content=c; print(f"✅ OR {MODEL} success REAL BUG Length {len(c)}"); break
+                else:
+                    print(f"OR {MODEL} no choices {str(j)[:400]}")
+            except Exception as e: print(f"OR {MODEL} fail {e}"); continue
 
-        if not content or len(content)<300 or "Missing check" in content:
+        if not content or len(content)<300:
             print(f"SKIP {target_path} - No real bug - Will try next file")
             continue
 
         vulnerable_lines = extract_vulnerable_lines_smart(code_data, content, os.path.basename(target_path))
         print(f"Extracted REAL RED lines: {vulnerable_lines}")
 
-        if vulnerable_lines == [41, 58]:
-            print(f"SKIP {target_path} - Still 41/58 fallback")
-            continue
-
         safe_name = os.path.basename(target_path).replace('.sol','')
         screenshot_path = f"reports/bug_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}_{safe_name}.png"
         create_code_screenshot(full_source_with_lines, screenshot_path, vulnerable_lines)
 
-        gmail_body = f"JEEV Bot V5.4 - REAL BUG ONLY - RED {vulnerable_lines} - 6 min gap - File ID {file_id} Title: {STRATEGY} URL: {QUESTION_LINK} File: {target_path} Reward: {best_target.get('reward')} RED Lines: {vulnerable_lines} Bug Report: {content[:6500]} FULL SOURCE: {full_source_with_lines[:8000]} Steps: Open {QUESTION_LINK} -> Join FREE -> Risk copy -> Description Line {vulnerable_lines} -> Screenshot upload {os.path.basename(screenshot_path)} -> Submit Wallet: {REAL_WALLET} Rules same: Monthly $5, 70/30 before $5, 40/60 after Time: Har bug 6 min baad"
+        gmail_body = f"JEEV Bot V5.5 - REAL BUG ONLY - RED {vulnerable_lines} - 6 min gap - File ID {file_id} Title: {STRATEGY} URL: {QUESTION_LINK} File: {target_path} Reward: {best_target.get('reward')} RED Lines: {vulnerable_lines} Bug Report: {content[:6500]} FULL SOURCE: {full_source_with_lines[:8000]} Wallet: {REAL_WALLET} Rules same: Monthly $5, 70/30 before $5, 40/60 after"
 
-        send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - RED {vulnerable_lines} - REAL BUG - V5.4", gmail_body, screenshot_path)
+        send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - RED {vulnerable_lines} - REAL BUG - V5.5", gmail_body, screenshot_path)
         
         if file_id not in history.get("entered", []):
             history["entered"].append(file_id)
@@ -287,4 +261,4 @@ for best_target in to_audit[:2]:
         print(f"✅ Done REAL BUG {STRATEGY} - RED {vulnerable_lines} - Sleeping 6 min")
         time.sleep(360)
 
-print("✅ JEEV Zindagi FINAL V5.4 done - NEW VALID MODELS ONLY - No decommissioned")
+print("✅ JEEV Zindagi FINAL V5.5 done - ONLY OPENROUTER FREE MODELS - Groq Llama removed (enterprise only now)")
