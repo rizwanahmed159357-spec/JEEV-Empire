@@ -1,4 +1,21 @@
 {
   "submitted": [],
-  "entered": []
+  "entered": [
+    "Liquity Bold:ActivePool.sol",
+    "Liquity Bold:AddressesRegistry.sol",
+    "Liquity Bold:BoldToken.sol",
+    "Liquity Bold:BorrowerOperations.sol",
+    "Liquity Bold:CollSurplusPool.sol",
+    "Liquity Bold:CollateralRegistry.sol",
+    "Liquity Bold:DefaultPool.sol",
+    "Liquity Bold:AddRemoveManagers.sol",
+    "Liquity Bold:Constants.sol",
+    "Agglayer Vault Bridge:ERC20PermitUser.sol",
+    "Agglayer Vault Bridge:IAgglayerBridge.sol",
+    "Agglayer Vault Bridge:IVaultBridgeTokenInitializer.sol",
+    "Agglayer Vault Bridge:IWETH9.sol",
+    "Agglayer Vault Bridge:InitializationCounterUpgradeable.sol",
+    "Agglayer Vault Bridge:MigrationManager.sol",
+    "Agglayer Vault Bridge:VaultBridgeToken.sol"
+  ]
 }
