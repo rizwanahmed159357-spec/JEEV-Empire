@@ -18,7 +18,7 @@ jobs:
       - name: Install deps
         run: |
           pip install requests openai Pillow
-      - name: Run bot
+      - name: Find and run bot
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -27,13 +27,14 @@ jobs:
           GMAIL_USER: ${{ secrets.EMAIL_USERNAME }}
           GMAIL_PASS: ${{ secrets.EMAIL_PASSWORD }}
         run: |
-          python JEEV-Empire/zindagi.py
+          ls -la
+          echo "Running root zindagi.py"
+          python zindagi.py
       - name: Push reports
         if: always()
         run: |
           git config --global user.name "JEEV AI Bot"
           git config --global user.email "jeev-bot@github.com"
-          git add reports JEEV-Empire/reports JEEV-Empire/*.json jeev_wallet.json -f || true
           git add -A || true
-          git commit -m "bot report ${{ github.run_number }}" || true
+          git commit -m "bot ${{ github.run_number }}" || true
           git push || true
