@@ -1,12 +1,12 @@
 {
-  "balance": 244.0,
+  "balance": 594.0,
   "real_wallet": "0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40",
-  "status": "ONLINE - Found Agglayer Vault Bridge - $250000 - FREE - Gmail sent to rizwanahmed159357@gmail.com with bug screenshot",
-  "last_run": "2026-11-01 08:30:41.175946",
+  "status": "ONLINE - Agglayer Vault Bridge - GenericCustomTokenAgglayer.sol - $250000 - FREE - RED [41, 58]",
+  "last_run": "2026-11-01 09:18:58.684060",
   "last_strategy": "Agglayer Vault Bridge - $250000 - FREE",
-  "osaf_earning": 82.0,
+  "osaf_earning": 222.0,
   "total_monthly_collected": 10,
   "last_paid_month": "2026-11",
-  "jeev_life_fund": 108.0,
-  "total_earned": 180
+  "jeev_life_fund": 318.0,
+  "total_earned": 530
 }
