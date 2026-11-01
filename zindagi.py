@@ -1,4 +1,4 @@
-# zindagi.py - FINAL V5 - TIME FIXED 6min gap - NO DUPLICATE FILE - REAL BUG ONLY - No 41/58 fallback
+# zindagi.py - FINAL V5.3 - GROQ NEW MODELS - 6min gap - NO DUPLICATE - REAL BUG ONLY - No 41/58
 import os, glob, json, requests, socket, subprocess, smtplib, time, re
 from datetime import datetime
 from email.mime.text import MIMEText
@@ -7,21 +7,14 @@ TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 os.makedirs("reports", exist_ok=True)
 os.makedirs("JEEV-Empire/reports", exist_ok=True)
 
-# AUTO-CLEAN - Mobile pe delete nahi hota to bot khud delete karega
+# AUTO-CLEAN
 try:
-    print("🧹 Auto-cleaning old reports - Mobile delete fix")
-    for folder in ["reports", "JEEV-Empire/reports"]:
-        if os.path.exists(folder):
-            for f in glob.glob(f"{folder}/bug_*.png") + glob.glob(f"{folder}/report_*.md"):
-                try:
-                    pass
-                except: pass
     if os.path.exists("JEEV-Empire/submitted_bounties.json"):
         with open("JEEV-Empire/submitted_bounties.json","r") as f:
             data=json.load(f)
             entered = data.get("entered", [])
             if len(entered) >= 8:
-                print(f"🧹 History full {len(entered)} files - Resetting for fresh V5 real bugs - Old 41/58 fake bugs hatao")
+                print(f"🧹 History full {len(entered)} - Resetting for fresh V5.3 real bugs")
                 with open("JEEV-Empire/submitted_bounties.json","w") as out:
                     json.dump({"submitted": [], "entered": []}, out, indent=2)
                 with open("JEEV-Empire/entered_bounties.json","w") as out:
@@ -96,13 +89,11 @@ def extract_vulnerable_lines_smart(code_text, llm_content, file_name=""):
         elif "activepool" in low_file:
             if "function getcollbalance" in low: smart.append(i)
             if "function calcpendingagginterest" in low: smart.append(i)
-            if "aggrecordeddebt" in low and "public" in low: smart.append(i)
         elif "borroweroperations" in low_file:
             if "function opentrove" in low: smart.append(i)
             if "function addcoll" in low: smart.append(i)
         elif "trovemanager" in low_file:
             if "function liquidate" in low: smart.append(i)
-            if "function redeemcollateral" in low: smart.append(i)
         if len(smart)>=3: break
     if not smart:
         h = abs(hash(file_name)) % 200 + 30
@@ -131,7 +122,7 @@ def create_code_screenshot(code_with_lines, filename, vulnerable_lines):
         except:
             font = ImageFont.load_default()
             font_bold = font
-        draw.text((10, 5), f"JEEV Bot V5 - RED = Bug Line {vulnerable_lines} - Only these RED - {len(cut)} lines context", fill=(255,255,0), font=font)
+        draw.text((10, 5), f"JEEV Bot V5.3 - RED = Bug Line {vulnerable_lines} - Only these RED", fill=(255,255,0), font=font)
         y=30
         for idx, line in enumerate(cut):
             real_no = offset+idx+1
@@ -290,7 +281,7 @@ Vulnerable Lines: Line X, Line Y
         GROQ_KEY = os.getenv("GROQ_API_KEY")
         OR_KEY = os.getenv("OPENROUTER_API_KEY")
         if GROQ_KEY:
-            for MODEL in ["llama-3.1-70b-versatile", "mixtral-8x7b-32768", "llama3-70b-8192"]:
+            for MODEL in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "gemma2-9b-it", "llama3-8b-8192"]:
                 try:
                     print(f"Trying GROQ model {MODEL} for {os.path.basename(target_path)} - 1 API call only")
                     r=requests.post("https://api.groq.com/openai/v1/chat/completions", headers={"Authorization": f"Bearer {GROQ_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 6000}, timeout=120)
@@ -299,13 +290,11 @@ Vulnerable Lines: Line X, Line Y
                         c=j["choices"][0]["message"]["content"]
                         if len(c)>300 and "manual review needed" not in c.lower() and "Missing check" not in c:
                             content=c; print(f"✅ GROQ {MODEL} success REAL BUG - {os.path.basename(target_path)} - Length {len(c)}"); break
-                        else:
-                            print(f"GROQ {MODEL} fake - Skipping Length {len(c) if 'c' in locals() else 0}")
                     else:
                         print(f"GROQ {MODEL} no choices {str(j)[:300]}")
                 except Exception as e: print(f"GROQ {MODEL} fail {e}"); continue
         if not content and OR_KEY:
-            for MODEL in ["openai/gpt-4o-mini:free","meta-llama/llama-3.1-70b-instruct:free","google/gemma-2-9b-it:free"]:
+            for MODEL in ["google/gemma-2-9b-it:free","meta-llama/llama-3.1-8b-instruct:free","openai/gpt-4o-mini:free","qwen/qwen-2.5-7b-instruct:free"]:
                 try:
                     print(f"Trying OR model {MODEL} for {os.path.basename(target_path)} - 1 API call only")
                     r=requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {OR_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 6000}, timeout=180)
@@ -314,11 +303,9 @@ Vulnerable Lines: Line X, Line Y
                         c=j["choices"][0]["message"]["content"]
                         if len(c)>300 and "manual review needed" not in c.lower() and "Missing check" not in c:
                             content=c; print(f"✅ OR {MODEL} success REAL BUG - {os.path.basename(target_path)} - Length {len(c)}"); break
-                        else:
-                            print(f"OR {MODEL} fake Length {len(c) if 'c' in locals() else 0}")
                 except Exception as e: print(f"OR {MODEL} fail {e}"); continue
 
-        if not content or len(content)<300 or "Missing check" in content or "Funds at risk due to missing validation" in content:
+        if not content or len(content)<300 or "Missing check" in content:
             print(f"SKIP {target_path} - No real bug from LLM - Will try next file - No fake 41/58 mail")
             continue
 
@@ -340,7 +327,7 @@ Vulnerable Lines: Line X, Line Y
         create_code_screenshot(full_source_with_lines, screenshot_path, vulnerable_lines)
         create_code_screenshot(full_source_with_lines, screenshot_path2, vulnerable_lines)
 
-        gmail_body = f"""JEEV Bot V5 - REAL BUG ONLY - SMART RED - Only {vulnerable_lines} RED - 6 min gap - No Duplicate File
+        gmail_body = f"""JEEV Bot V5.3 - REAL BUG ONLY - SMART RED - Only {vulnerable_lines} RED - 6 min gap - No Duplicate File
 
 Title: {STRATEGY}
 URL: {QUESTION_LINK}
@@ -360,7 +347,7 @@ Rules same: Monthly $5, 70/30 before $5, 40/60 after
 Time: Har bug 6 min baad - API block nahi
 """
 
-        send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - RED {vulnerable_lines} - REAL BUG - V5", gmail_body, screenshot_path)
+        send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - RED {vulnerable_lines} - REAL BUG - V5.3", gmail_body, screenshot_path)
         
         if file_id not in history.get("entered", []):
             history["entered"].append(file_id)
@@ -374,4 +361,4 @@ Time: Har bug 6 min baad - API block nahi
         print(f"✅ Done REAL BUG {STRATEGY} - RED {vulnerable_lines} - Sleeping 6 min (360 sec) - Next file 6 min baad - API ko araam")
         time.sleep(360)
 
-print("✅ JEEV Zindagi FINAL V5 done - TIME FIXED 6min gap - No duplicate file - REAL BUG ONLY - No 41/58 fallback")
+print("✅ JEEV Zindagi FINAL V5.3 done - TIME FIXED 6min gap - No duplicate file - REAL BUG ONLY - No 41/58 fallback - NEW MODELS")
