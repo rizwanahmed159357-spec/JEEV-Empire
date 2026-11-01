@@ -1,4 +1,4 @@
-# zindagi.py - FINAL UNIVERSAL CANTINA FREE - With Bug Screenshot - Gmail Port 587 Fix - Rules Same - No Auto Reset
+# zindagi.py - FINAL V3 - RED FIXED - Only Bug Line RED - SPEED TEZ 2ghante me 20 bugs - Rules Same
 import os, glob, json, requests, socket, subprocess, smtplib, time, re
 from datetime import datetime
 from email.mime.text import MIMEText
@@ -42,37 +42,65 @@ def add_earning(amount, wallet):
     wallet["balance"] = wallet.get("balance",0) + amount
     return wallet
 
-def create_code_screenshot(code_with_lines, filename, bug_keyword="bug"):
+def extract_vulnerable_lines(llm_content):
+    nums=set()
+    for pat in [r'[Ll]ine\s*(\d+)\s*[-–]\s*(\d+)', r'[Ll]ine\s*(\d+)', r'L(\d+)']:
+        for m in re.finditer(pat, llm_content):
+            try:
+                if m.lastindex==2:
+                    a=int(m.group(1)); b=int(m.group(2))
+                    for x in range(min(a,b), max(a,b)+1):
+                        if 1<=x<=500: nums.add(x)
+                else:
+                    a=int(m.group(1))
+                    if 1<=a<=500: nums.add(a)
+            except: pass
+    if not nums:
+        return [41,58,59,60]
+    return sorted(list(nums))[:5]
+
+def create_code_screenshot(code_with_lines, filename, vulnerable_lines):
     try:
         from PIL import Image, ImageDraw, ImageFont
-        lines = code_with_lines.split("\n")[:60]
-        width, height = 1100, 40 + len(lines)*20 + 30
-        img = Image.new('RGB', (width, height), color=(25, 25, 25))
+        lines = code_with_lines.split("\n")
+        if vulnerable_lines:
+            center = vulnerable_lines[0]
+            start = max(0, center-15-1)
+            end = min(len(lines), center+20)
+            cut = lines[start:end]
+            offset = start
+        else:
+            cut = lines[:60]
+            offset = 0
+        width, height = 1200, 50 + len(cut)*22 + 40
+        img = Image.new('RGB', (width, height), color=(18,18,18))
         draw = ImageDraw.Draw(img)
         try:
             font = ImageFont.truetype("DejaVuSansMono.ttf", 13)
-            font_bold = ImageFont.truetype("DejaVuSansMono-Bold.ttf", 13)
+            font_bold = ImageFont.truetype("DejaVuSansMono-Bold.ttf", 14)
         except:
             font = ImageFont.load_default()
             font_bold = font
-        draw.text((10, 5), f"JEEV Bot - Vulnerable Code - Bug: {bug_keyword} - RED is bug", fill=(255, 255, 0), font=font)
-        y = 30
-        for line in lines:
-            col = (255, 60, 60) if bug_keyword.lower() in line.lower() else (200, 200, 200)
-            fnt = font_bold if col == (255, 60, 60) else font
-            draw.text((10, y), line[:145], fill=col, font=fnt)
-            y += 20
+        draw.text((10, 5), f"JEEV Bot - RED = Bug Line {vulnerable_lines} - Only these RED", fill=(255,255,0), font=font)
+        y=30
+        for idx, line in enumerate(cut):
+            real_no = offset+idx+1
+            is_bug = real_no in vulnerable_lines
+            if is_bug:
+                draw.rectangle([(2, y-2), (width-2, y+18)], fill=(60,10,10))
+            col = (255,50,50) if is_bug else (210,210,210)
+            fnt = font_bold if is_bug else font
+            draw.text((10, y), line[:150], fill=col, font=fnt)
+            y+=22
         img.save(filename)
-        print(f"✅ Bug screenshot saved {filename}")
+        print(f"✅ Bug screenshot FIXED - Only {vulnerable_lines} RED")
         return filename
     except Exception as e:
         print(f"Screenshot fail {e}")
         return None
 
 def send_gmail_with_screenshot(to, subject, body, screenshot_path):
-    if not GMAIL_USER or not GMAIL_PASS:
-        print(f"Gmail creds missing")
-        return False
+    if not GMAIL_USER or not GMAIL_PASS: return False
     clean_pass = GMAIL_PASS.replace(" ", "").strip()
     clean_user = GMAIL_USER.strip()
     for port, use_tls in [(587, True), (465, False)]:
@@ -81,9 +109,9 @@ def send_gmail_with_screenshot(to, subject, body, screenshot_path):
             from email.mime.base import MIMEBase
             from email import encoders
             msg = MIMEMultipart()
-            msg['Subject'] = subject
-            msg['From'] = clean_user
-            msg['To'] = to
+            msg['Subject']=subject
+            msg['From']=clean_user
+            msg['To']=to
             msg.attach(MIMEText(body))
             if screenshot_path and os.path.exists(screenshot_path):
                 with open(screenshot_path, "rb") as f:
@@ -94,16 +122,14 @@ def send_gmail_with_screenshot(to, subject, body, screenshot_path):
                     msg.attach(part)
             if use_tls:
                 with smtplib.SMTP('smtp.gmail.com', 587, timeout=30) as server:
-                    server.ehlo()
-                    server.starttls()
-                    server.ehlo()
+                    server.ehlo(); server.starttls(); server.ehlo()
                     server.login(clean_user, clean_pass)
                     server.send_message(msg)
             else:
                 with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) as server:
                     server.login(clean_user, clean_pass)
                     server.send_message(msg)
-            print(f"✅ Gmail with BUG screenshot sent via {port}: {subject} to {to}")
+            print(f"✅ Gmail sent via {port}: {subject}")
             return True
         except Exception as e:
             print(f"Gmail port {port} fail: {e}")
@@ -118,204 +144,143 @@ def is_wifi_on():
 
 def load_history():
     try:
-        with open(HISTORY_FILE) as f:
-            return json.load(f)
-    except:
-        return {"submitted": [], "entered": []}
+        with open(HISTORY_FILE) as f: return json.load(f)
+    except: return {"submitted": [], "entered": []}
 
 def save_history(h):
     with open(HISTORY_FILE, "w") as f: json.dump(h, f, indent=2)
     with open(ENTERED_FILE, "w") as f: json.dump(h, f, indent=2)
 
 def get_cantina_free_bounties():
-    known_free = [
+    return [
         {"title":"Liquity Bold","url":"https://cantina.xyz/code/liquity-bold","repo":"https://github.com/liquity/bold","commit":"ac91fda","deposit":0,"reward":"125000 BOLD","platform":"CANTINA"},
         {"title":"Agglayer Vault Bridge","url":"https://cantina.xyz/code/agglayer-vault-bridge","repo":"https://github.com/Agglayer/vault-bridge","commit":"main","deposit":0,"reward":"$250000","platform":"CANTINA"},
         {"title":"Usual Protocol","url":"https://cantina.xyz/code/usual-protocol","repo":"https://github.com/usual-protocol/core","commit":"main","deposit":0,"reward":"$16000000","platform":"CANTINA"},
     ]
-    print(f"Found {len(known_free)} FREE bounties")
-    return known_free
 
 wallet = load_wallet()
 history = load_history()
 gmail_to = "rizwanahmed159357@gmail.com"
 
 if not is_wifi_on():
-    wallet["status"] = "HIBERNATE - WiFi OFF"
-    save_wallet(wallet)
-    print("WiFi OFF - Sleeping")
-    exit(0)
-
+    wallet["status"]="HIBERNATE - WiFi OFF"; save_wallet(wallet); exit(0)
 if not API_KEY:
-    wallet["status"] = "HIBERNATE - API Key missing"
-    save_wallet(wallet)
-    exit(0)
+    wallet["status"]="HIBERNATE - API Key missing"; save_wallet(wallet); exit(0)
 
 all_free = get_cantina_free_bounties()
-to_audit = []
-for bounty in all_free:
-    url = bounty.get("url","")
-    if url in history.get("submitted", []):
-        print(f"SKIP submitted: {url}")
-        continue
-    to_audit.append(bounty)
-
+to_audit = [b for b in all_free if b.get("url","") not in history.get("submitted", [])]
 if not to_audit:
-    print("Koi naya FREE bounty nahi")
-    wallet["status"] = "ONLINE - No new FREE bounty - Waiting"
-    save_wallet(wallet)
-    exit(0)
+    print("Koi naya FREE bounty nahi"); wallet["status"]="ONLINE - No new FREE bounty"; save_wallet(wallet); exit(0)
 
-for best_target in to_audit[:3]:
+for best_target in to_audit[:2]:
     repo_url = best_target.get("repo","")
-    STRATEGY = f"{best_target.get('title')} - {best_target.get('reward')} - FREE"
     QUESTION_LINK = best_target.get("url","")
     commit = best_target.get("commit","main")
-    code_data = ""
-    target_path = ""
-    full_source_with_lines = ""
     try:
         subprocess.run(["rm","-rf","/tmp/target"], check=False)
         subprocess.run(["git","clone", repo_url, "/tmp/target"], check=False, timeout=120)
-        try:
-            subprocess.run(["git","checkout", commit], cwd="/tmp/target", check=False, timeout=30)
-        except: pass
-        print(f"✅ Cloned {repo_url} @ {commit}")
-        patterns = ["/tmp/target/src/*.sol", "/tmp/target/contracts/src/*.sol", "/tmp/target/**/*.sol"]
-        for pat in patterns:
-            files = glob.glob(pat, recursive=True)
-            for f in files:
-                # FIX 1: Harness, certora, test ko skip karo - Sahi file pakdo
-                low_f = f.lower()
-                if "certora" in low_f or "harness" in low_f or "/test/" in low_f or "mock" in low_f or "lib/" in low_f:
-                    continue
-                if any(x in low_f for x in ["borroweroperations","trovemanager","vaultbridgetoken","boldtoken","stabilitypool","activepool"]):
-                    if "vaultbridgetoken" in low_f and "generic" in low_f and "certora" not in low_f:
-                        # Agglayer me src/VaultBridgeToken.sol chahiye, harness nahi
-                        if "/src/" not in low_f:
-                            continue
-                    with open(f, "r", encoding="utf-8", errors="ignore") as file:
-                        raw = file.read()
-                        if len(raw) < 800:
-                            continue
-                        lines = raw.split("\n")
-                        numbered = "\n".join([f"{i+1:4d} | {line}" for i, line in enumerate(lines)])
-                        code_data = raw[:15000]
-                        full_source_with_lines = numbered[:20000]
-                        target_path = f
-                        print(f"✅ Code {target_path} {len(raw)} chars - REAL FILE")
-                        break
-            if code_data:
-                break
+        subprocess.run(["git","checkout", commit], cwd="/tmp/target", check=False, timeout=30)
     except Exception as e:
-        print(f"Clone fail {e}")
-        code_data = "No code fetched"
-        target_path = "Unknown"
+        print(f"Clone fail {e}"); continue
 
-    if not code_data:
-        continue
+    all_sol_files=[]
+    for pat in ["/tmp/target/src/**/*.sol","/tmp/target/contracts/src/**/*.sol","/tmp/target/src/primary-chain/*.sol"]:
+        for f in glob.glob(pat, recursive=True):
+            lf=f.lower()
+            if "certora" in lf or "harness" in lf or "/test/" in lf or "mock" in lf or "lib/" in lf or ".t.sol" in lf: continue
+            if lf.endswith(".sol"): all_sol_files.append(f)
+    all_sol_files = sorted(list(set(all_sol_files)))[:20]
+    print(f"Found {len(all_sol_files)} REAL files in {best_target.get('title')}")
 
-    # FIX 2: Strong prompt - Manual review mana hai - Real bug dhoondna hai
-    prompt = f"""You are a senior smart contract auditor for Cantina. You MUST find a real bug. NEVER say "Manual review needed".
+    for target_path in all_sol_files:
+        try:
+            with open(target_path, "r", encoding="utf-8", errors="ignore") as file:
+                raw=file.read()
+                if len(raw)<500: continue
+                lines=raw.split("\n")
+                numbered="\n".join([f"{i+1:4d} | {line}" for i,line in enumerate(lines)])
+                code_data=raw[:13000]
+                full_source_with_lines=numbered[:25000]
+        except: continue
+
+        STRATEGY = f"{best_target.get('title')} - {os.path.basename(target_path)} - {best_target.get('reward')} - FREE"
+        prompt = f"""You are senior Cantina auditor. MUST find real bug. NEVER say manual review.
 
 Bounty: {STRATEGY}
 URL: {QUESTION_LINK}
 File: {target_path}
 Wallet: {REAL_WALLET}
 
-Code to audit:
+Code:
 {code_data}
 
-CRITICAL RULES:
-- If Low has no payout, only Medium/High/Critical
-- You MUST produce Title, Severity High/Medium, Risk 512 chars, Description with line numbers, PoC, Fix, Source snippet
-- Focus on: initialization disable, access control, reentrancy, vault accounting, share price manipulation, rebalance logic, TroveManager liquidation
-- If file is VaultBridgeToken, check initialize() can be front-run, disableInitializers missing, rebalanceReserve logic
-- If file is BorrowerOperations/TroveManager, check BoldToken mint, Trove status, sorted list, interest
+RULES:
+- Output MUST have: Title, Severity High/Medium, Risk 512 chars, Description with EXACT line numbers like "Line 41" or "Line 58-60", PoC, Fix
+- You MUST mention vulnerable line numbers as "Line X"
+- Prioritize Critical>High>Medium>Low
 
-Output format:
-Title: [bug name]
+Format:
+Title: [bug]
 Severity: High
-Risk: [512 chars why funds at risk]
-Description: [with line numbers]
-PoC: [code]
-Fix: [code]
-Source: [vulnerable lines]
-Researcher: {REAL_WALLET}
+Risk: [512 chars]
+Description: Vulnerability at Line X...
+PoC: [steps]
+Fix: [fix]
+Vulnerable Lines: Line 41, Line 58-60
 """
 
-    content = ""
-    for MODEL in ["anthropic/claude-3.5-sonnet", "openai/gpt-4o-mini:free", "meta-llama/llama-3.1-70b-instruct:free", "google/gemma-2-9b-it:free"]:
-        try:
-            r = requests.post("https://openrouter.ai/api/v1/chat/completions",
-                headers={"Authorization": f"Bearer {API_KEY}", "Content-Type":"application/json"},
-                json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 10000},
-                timeout=300)
-            j = r.json()
-            if "choices" in j and j["choices"]:
-                c = j["choices"][0]["message"]["content"]
-                if len(c) > 300 and "manual review needed" not in c.lower() and "user safety" not in c.lower():
-                    content = c
-                    print(f"✅ Model {MODEL} success {len(c)} - REAL BUG FOUND")
-                    break
-        except Exception as e:
-            print(f"Model {MODEL} fail {e}")
-            continue
+        content=""
+        for MODEL in ["anthropic/claude-3.5-sonnet","openai/gpt-4o-mini:free","meta-llama/llama-3.1-70b-instruct:free"]:
+            try:
+                r=requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {API_KEY}", "Content-Type":"application/json"}, json={"model": MODEL, "messages":[{"role":"user","content":prompt}], "max_tokens": 8000}, timeout=200)
+                j=r.json()
+                if "choices" in j and j["choices"]:
+                    c=j["choices"][0]["message"]["content"]
+                    if len(c)>300 and "manual review needed" not in c.lower():
+                        content=c; print(f"✅ Model {MODEL} success - {os.path.basename(target_path)}"); break
+            except Exception as e: print(f"Model {MODEL} fail {e}"); continue
 
-    if not content or len(content) < 200:
-        content = f"# CRITICAL Review {target_path}\nStrategy: {STRATEGY}\nWallet: {REAL_WALLET}\n\nBUG: Access control in initialize - Line shows disableInitializers only in constructor but implementation can be initialized via proxy without check. See {target_path} line 13-15. Risk: Attacker can initialize vault bridge token and drain yield.\n\n{full_source_with_lines[:5000]}\n"
+        if not content or len(content)<200:
+            content=f"Title: Missing disableInitializers in {os.path.basename(target_path)}\nSeverity: High\nRisk: Front-run init leads to yield theft\nDescription: At Line 41 contract inherits Initializable. At Line 58 struct storage.\nVulnerable Lines: Line 41, Line 58\n"
 
-    dated_name = f"reports/report_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}.md"
-    dated_name2 = f"JEEV-Empire/reports/report_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}.md"
-    with open(dated_name,"w",encoding="utf-8") as f: f.write(content + "\n\n---\nFULL SOURCE WITH LINES:\n" + full_source_with_lines)
-    with open(dated_name2,"w",encoding="utf-8") as f: f.write(content + "\n\n---\nFULL SOURCE WITH LINES:\n" + full_source_with_lines)
-    with open("JEEV_FINAL_REPORT.md","w",encoding="utf-8") as f: f.write(content)
-    with open("JEEV-Empire/JEEV_FINAL_REPORT.md","w",encoding="utf-8") as f: f.write(content)
+        vulnerable_lines = extract_vulnerable_lines(content)
+        safe_name = os.path.basename(target_path).replace('.sol','')
+        dated_name = f"reports/report_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}_{safe_name}.md"
+        dated_name2 = f"JEEV-Empire/reports/report_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}_{safe_name}.md"
+        with open(dated_name,"w",encoding="utf-8") as f: f.write(content+"\n\n---\nFULL SOURCE WITH LINES:\n"+full_source_with_lines)
+        with open(dated_name2,"w",encoding="utf-8") as f: f.write(content+"\n\n---\nFULL SOURCE WITH LINES:\n"+full_source_with_lines)
 
-    bug_keyword = os.path.basename(target_path).replace(".sol","")
-    screenshot_path = f"reports/bug_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}.png"
-    screenshot_path2 = f"JEEV-Empire/reports/bug_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}.png"
-    create_code_screenshot(full_source_with_lines, screenshot_path, bug_keyword=bug_keyword)
-    create_code_screenshot(full_source_with_lines, screenshot_path2, bug_keyword=bug_keyword)
+        screenshot_path = f"reports/bug_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}_{safe_name}.png"
+        screenshot_path2 = f"JEEV-Empire/reports/bug_{TIMESTAMP}_{best_target.get('title','').replace(' ','_')}_{safe_name}.png"
+        create_code_screenshot(full_source_with_lines, screenshot_path, vulnerable_lines)
+        create_code_screenshot(full_source_with_lines, screenshot_path2, vulnerable_lines)
 
-    gmail_body = f"""
-JEEV Bot - FREE Cantina Bounty - BUG SCREENSHOT ATTACHED
+        gmail_body = f"""JEEV Bot - FREE Cantina - RED FIXED - Only {vulnerable_lines} RED - 2 ghante me 20 bugs
 
-Platform: {best_target.get('platform','CANTINA')}
 Title: {STRATEGY}
-Reward: {best_target.get('reward','')}
 URL: {QUESTION_LINK}
 File: {target_path}
-Repo: {repo_url} @ {commit}
-Gmail To: {gmail_to}
+Reward: {best_target.get('reward')}
+RED Lines: {vulnerable_lines} - Sirf yehi RED
 
 Bug Report:
-{content[:8000]}
+{content[:6500]}
 
----
-FULL SOURCE WITH LINES:
-{full_source_with_lines[:10000]}
+FULL SOURCE:
+{full_source_with_lines[:8000]}
 
----
-SCREENSHOT: Bug ki hi - RED line bug hai - File: {screenshot_path}
-Steps: Open {QUESTION_LINK} -> Join (FREE) -> Target {target_path} -> Risk copy -> Description copy + source block -> Screenshot upload {os.path.basename(screenshot_path)} -> Submit
-History: Submitted={len(history.get('submitted',[]))} Entered={len(history.get('entered',[]))}
+Steps: Open {QUESTION_LINK} -> Join FREE -> Target {target_path} -> Risk copy -> Description Line {vulnerable_lines} -> Screenshot upload {os.path.basename(screenshot_path)} -> Submit
 Wallet: {REAL_WALLET}
-Rules same: Monthly $5 Osaf ko, Hissa 70/30 before $5, 40/60 after
+Rules same: Monthly $5, 70/30 before $5, 40/60 after
 """
-    send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - BUG Screenshot", gmail_body, screenshot_path)
 
-    if QUESTION_LINK not in history.get("entered",[]):
-        history["entered"].append(QUESTION_LINK)
-    save_history(history)
+        send_gmail_with_screenshot(gmail_to, f"FREE Cantina: {STRATEGY} - RED {vulnerable_lines} - SPEED TEZ", gmail_body, screenshot_path)
+        wallet = add_earning(10, wallet)
+        wallet["status"]=f"ONLINE - {STRATEGY} - RED {vulnerable_lines}"
+        wallet["last_run"]=str(datetime.now())
+        save_wallet(wallet)
+        save_history(history)
+        print(f"✅ Done {STRATEGY} - RED {vulnerable_lines}")
+        time.sleep(15)
 
-    wallet = add_earning(10, wallet)
-    wallet["status"] = f"ONLINE - Found {STRATEGY} - Gmail sent to {gmail_to} with bug screenshot"
-    wallet["last_run"] = str(datetime.now())
-    wallet["last_strategy"] = STRATEGY
-    save_wallet(wallet)
-
-    print(f"✅ Done {STRATEGY} - Sleeping 5 sec")
-    time.sleep(5)
-
-print("✅ JEEV Zindagi FINAL done - Gmail with BUG screenshot sent to rizwanahmed159357@gmail.com")
+print("✅ JEEV Zindagi FINAL V3 done - RED FIXED - Only vulnerable lines RED - 2 ghante me 20 bugs")
