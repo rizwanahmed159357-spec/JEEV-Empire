@@ -12,6 +12,10 @@
     "Agglayer Vault Bridge:IVaultBridgeTokenInitializer.sol",
     "Agglayer Vault Bridge:IWETH9.sol",
     "Agglayer Vault Bridge:InitializationCounterUpgradeable.sol",
-    "Agglayer Vault Bridge:MigrationManager.sol"
+    "Agglayer Vault Bridge:MigrationManager.sol",
+    "Liquity Bold:CollateralRegistry.sol",
+    "Liquity Bold:DefaultPool.sol",
+    "Liquity Bold:AddRemoveManagers.sol",
+    "Agglayer Vault Bridge:VaultBridgeToken.sol"
   ]
 }

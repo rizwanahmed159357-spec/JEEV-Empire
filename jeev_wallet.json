@@ -1,12 +1,12 @@
 {
-  "balance": 1034.0,
+  "balance": 1074.0,
   "real_wallet": "0x3e9f8D47103E2f6a6DcBEDf913c1d8E1f97A1C40",
-  "status": "ONLINE - Agglayer Vault Bridge - MigrationManager.sol - $250000 - FREE - RED [229, 230, 231] - REAL",
-  "last_run": "2026-11-01 15:34:17.824366",
+  "status": "ONLINE - Agglayer Vault Bridge - VaultBridgeToken.sol - $250000 - FREE - RED [201, 213, 226] - REAL",
+  "last_run": "2026-11-01 19:16:38.139927",
   "last_strategy": "Agglayer Vault Bridge - $250000 - FREE",
-  "osaf_earning": 398.0,
+  "osaf_earning": 414.0,
   "total_monthly_collected": 10,
   "last_paid_month": "2026-11",
-  "jeev_life_fund": 582.0,
-  "total_earned": 970
+  "jeev_life_fund": 606.0,
+  "total_earned": 1010
 }
